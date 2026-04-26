@@ -467,9 +467,52 @@ suite("TRACK-05: No save triggers", () => {
 });
 
 suite("PLAT-01: macOS and Linux", () => {
-  test("TODO: CI matrix runs on macOS-latest and ubuntu-latest", () => {
-    // Plan 07 fills this assertion
-    assert.ok(true, "stub — implement in Plan 07");
+  test("CI workflow exists with macos-latest and ubuntu-latest matrix", () => {
+    const fs = require("fs");
+    const path = require("path");
+
+    // ci.yml is at project root .github/workflows/ci.yml
+    // __dirname is in extension/out/test/ or extension/src/test/ — resolve upward
+    const ciPath = path.resolve(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "..",
+      ".github",
+      "workflows",
+      "ci.yml",
+    );
+    assert.ok(fs.existsSync(ciPath), `CI workflow must exist at ${ciPath}`);
+
+    const ciContent = fs.readFileSync(ciPath, "utf-8");
+    assert.ok(
+      ciContent.includes("macos-latest"),
+      "CI must include macos-latest",
+    );
+    assert.ok(
+      ciContent.includes("ubuntu-latest"),
+      "CI must include ubuntu-latest",
+    );
+    assert.ok(
+      ciContent.includes("fail-fast: false"),
+      "CI must have fail-fast: false",
+    );
+  });
+
+  test("os.homedir() returns non-empty string on current platform", () => {
+    // Validates platform path resolution works — runs on whatever OS executes the test suite
+    const os = require("os");
+    const homeDir = os.homedir();
+    assert.ok(
+      typeof homeDir === "string" && homeDir.length > 0,
+      "os.homedir() must return a non-empty path",
+    );
+    // macOS: /Users/... | Linux: /home/... or /root
+    assert.ok(
+      homeDir.startsWith("/"),
+      "home dir must be an absolute POSIX path on macOS/Linux",
+    );
   });
 });
 
