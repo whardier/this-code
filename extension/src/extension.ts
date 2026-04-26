@@ -93,9 +93,9 @@ export async function deactivate(): Promise<void> {
 }
 
 async function updateOpenFiles(db: Database, rowId: number): Promise<void> {
-  // Implemented in Plan 04 (Wave 2)
-  // Will rebuild open_files from vscode.workspace.textDocuments (D-02)
-  // Filters to uri.scheme === 'file'; handles false positives from language changes
+  // D-02: Rebuild from authoritative live list on every event.
+  // Prevents false positives from language mode changes (VS Code issue #102737):
+  // language detection fires close+open for same document; isClosed is false during the spurious close.
   const openFiles = vscode.workspace.textDocuments
     .filter((doc) => !doc.isClosed && doc.uri.scheme === "file")
     .map((doc) => doc.uri.fsPath);
@@ -105,6 +105,6 @@ async function updateOpenFiles(db: Database, rowId: number): Promise<void> {
       rowId,
     ]);
   } catch {
-    // DB error — log and continue
+    // DB error during update — swallow to avoid crashing the extension host
   }
 }
