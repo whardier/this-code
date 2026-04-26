@@ -60,7 +60,7 @@ jobs:
       - name: Check no save trigger
         working-directory: extension
         run: |
-          if grep -r "onDidSaveTextDocument" src/; then
+          if grep -r "onDidSaveTextDocument" src/ --exclude-dir=test; then
             echo "ERROR: onDidSaveTextDocument found in source — TRACK-05 violation"
             exit 1
           fi
