@@ -25,7 +25,7 @@
 - [x] **STOR-02
 **: Extension maintains a SQLite index at `~/.this-code/sessions.db` (WAL mode, busy timeout) aggregating all instance state
 - [x] **STOR-03
-**: SQLite schema includes: `id`, `recorded_at`, `workspace_path`, `user_data_dir`, `profile`, `server_commit_hash`, `server_bin_path`, `open_files` (JSON array)
+**: SQLite schema includes: `id`, `invoked_at`, `workspace_path`, `user_data_dir`, `profile`, `local_ide_path`, `remote_name`, `remote_server_path`, `server_commit_hash`, `server_bin_path`, `open_files` (JSON array)
 - [x] **STOR-04
 **: Extension scans and indexes existing `~/.vscode-server/bin/*/` directories on activation to populate the SQLite index
 - [x] **STOR-05
