@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-01-PLAN.md — extension scaffold with 2 tasks, 13 files created, tsc --noEmit passes
-last_updated: "2026-04-26T21:34:23.822Z"
+stopped_at: Completed 01-02-PLAN.md — initDatabase() implemented with WAL, schema migration, 2 tasks, 2 files modified
+last_updated: "2026-04-26T21:38:30.910Z"
 last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 7
-  completed_plans: 1
-  percent: 14
+  completed_plans: 2
+  percent: 29
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 
-Progress: [█░░░░░░░░░] 14%
+Progress: [███░░░░░░░] 29%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [█░░░░░░░░░] 14%
 
 _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P01 | 239 | 2 tasks | 13 files |
+| Phase 01-extension-core-storage-foundation P02 | 113 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Recent decisions affecting current work:
 - Added @types/node as dev dependency — required for os, path, fs/promises, assert type declarations; tsc --noEmit cannot pass without it for extension source
 - Did not create extension/src/test/index.ts — @vscode/test-cli discovers tests via .vscode-test.js glob automatically; manual Mocha runner conflicts with test-cli runner contract
 - extension/src/config.ts implemented completely in Wave 0 — it uses standard VS Code API (getConfiguration) with no stub needed
+- PRAGMA order locked: WAL first, busy_timeout second, DDL third — per T-02-01 threat mitigation
+- invoked_at is the locked column name per D-07, superseding REQUIREMENTS.md STOR-03 which says recorded_at
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T21:34:23.811Z
-Stopped at: Completed 01-01-PLAN.md — extension scaffold with 2 tasks, 13 files created, tsc --noEmit passes
+Last session: 2026-04-26T21:38:30.898Z
+Stopped at: Completed 01-02-PLAN.md — initDatabase() implemented with WAL, schema migration, 2 tasks, 2 files modified
 Resume file: None
