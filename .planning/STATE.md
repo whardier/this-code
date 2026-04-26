@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-05-PLAN.md — scanExistingRemoteSessions() full implementation, STOR-04 test stub replaced, 2 TDD commits
-last_updated: "2026-04-26T21:53:22.543Z"
+stopped_at: Completed 01-06-PLAN.md — OutputChannel logging integration, logLevel-gating, D-01 globalStorageUri validation, 1 task
+last_updated: "2026-04-26T21:57:16.775Z"
 last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 
-Progress: [███████░░░] 71%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P03 | 196 | 2 tasks | 3 files |
 | Phase 01-extension-core-storage-foundation P04 | 161 | 2 tasks | 2 files |
 | Phase 01-extension-core-storage-foundation P05 | 119 | 2 tasks | 2 files |
+| Phase 01-extension-core-storage-foundation P06 | 97 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - updateOpenFiles() uses D-02 rebuild pattern — reads vscode.workspace.textDocuments fresh on every event, filters !isClosed && scheme==='file'
 - parameterized UPDATE query (? placeholders) in updateOpenFiles — no template literals in SQL (T-04-01 mitigation)
 - Injectable binDir parameter in scanExistingRemoteSessions() enables deterministic testing without home dir access — entryDir used as authoritative dedup key (not JSON field value)
+- getLogLevel imported at module level via ES import in extension.ts — not inline require — enables live config reads on every log() call
+- Always-emit pattern for disabled and activation-failure messages in extension.ts — bypasses logLevel gate so users always know why extension is inactive
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T21:53:22.530Z
-Stopped at: Completed 01-05-PLAN.md — scanExistingRemoteSessions() full implementation, STOR-04 test stub replaced, 2 TDD commits
+Last session: 2026-04-26T21:57:16.762Z
+Stopped at: Completed 01-06-PLAN.md — OutputChannel logging integration, logLevel-gating, D-01 globalStorageUri validation, 1 task
 Resume file: None
