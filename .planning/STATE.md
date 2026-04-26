@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-02-PLAN.md — initDatabase() implemented with WAL, schema migration, 2 tasks, 2 files modified
-last_updated: "2026-04-26T21:38:30.910Z"
+stopped_at: Completed 01-03-PLAN.md — session.ts and writeSessionJson() implemented, 5 test stubs replaced, 3 commits
+last_updated: "2026-04-26T21:44:20.324Z"
 last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
-  percent: 29
+  completed_plans: 3
+  percent: 43
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [███░░░░░░░] 29%
 _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P01 | 239 | 2 tasks | 13 files |
 | Phase 01-extension-core-storage-foundation P02 | 113 | 2 tasks | 2 files |
+| Phase 01-extension-core-storage-foundation P03 | 196 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,9 @@ Recent decisions affecting current work:
 - extension/src/config.ts implemented completely in Wave 0 — it uses standard VS Code API (getConfiguration) with no stub needed
 - PRAGMA order locked: WAL first, busy_timeout second, DDL third — per T-02-01 threat mitigation
 - invoked_at is the locked column name per D-07, superseding REQUIREMENTS.md STOR-03 which says recorded_at
+- Private helpers in session.ts not exported — tested indirectly via getSessionJsonPath and writeSessionJson observable outputs
+- open_files:[] written as empty array at activation — document event handlers (Plan 04) update SQLite; JSON file is activation snapshot
+- schema_version:1 field in JSON enables future CLI format detection
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T21:38:30.898Z
-Stopped at: Completed 01-02-PLAN.md — initDatabase() implemented with WAL, schema migration, 2 tasks, 2 files modified
+Last session: 2026-04-26T21:44:20.312Z
+Stopped at: Completed 01-03-PLAN.md — session.ts and writeSessionJson() implemented, 5 test stubs replaced, 3 commits
 Resume file: None

@@ -20,7 +20,8 @@
 
 ### Session Storage
 
-- [ ] **STOR-01**: Extension writes per-instance session state as a text/JSON file inside `~/.vscode-server/bin/{commit-hash}/this-code-session.json` (or `.vscode/` for local)
+- [x] **STOR-01
+**: Extension writes per-instance session state as a text/JSON file inside `~/.vscode-server/bin/{commit-hash}/this-code-session.json` (or `.vscode/` for local)
 - [x] **STOR-02
 **: Extension maintains a SQLite index at `~/.this-code/sessions.db` (WAL mode, busy timeout) aggregating all instance state
 - [x] **STOR-03
@@ -31,9 +32,12 @@
 
 ### File Tracking
 
-- [ ] **TRACK-01**: Extension records workspace root path when workspace opens
-- [ ] **TRACK-02**: Extension records VS Code Server commit hash (parsed from `vscode.env.appRoot` or equivalent)
-- [ ] **TRACK-03**: Extension records `--user-data-dir` and `--profile` associated with this instance (via `globalStorageUri` path parsing or config)
+- [x] **TRACK-01
+**: Extension records workspace root path when workspace opens
+- [x] **TRACK-02
+**: Extension records VS Code Server commit hash (parsed from `vscode.env.appRoot` or equivalent)
+- [x] **TRACK-03
+**: Extension records `--user-data-dir` and `--profile` associated with this instance (via `globalStorageUri` path parsing or config)
 - [ ] **TRACK-04**: Extension records open file manifest (file paths) on `onDidOpenTextDocument` and `onDidCloseTextDocument` events
 - [ ] **TRACK-05**: Extension does NOT trigger on file save — open/close events only
 
