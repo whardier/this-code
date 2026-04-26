@@ -7,19 +7,24 @@
 
 ### Extension Core
 
-- [ ] **EXT-01**: Extension ID is `whardier.this-code`; marketplace name is "This Code"
-- [ ] **EXT-02**: Extension sets `extensionKind: ["workspace"]` so it runs where files are (local or SSH remote)
-- [ ] **EXT-03**: Extension activates on `onStartupFinished` (non-blocking, fires on every window)
-- [ ] **EXT-04**: Extension has no UI — config-only with an Output Channel for diagnostics
-- [ ] **EXT-05**: Extension exposes VS Code configuration settings (e.g., enable/disable recording, log level)
+- [x] **EXT-01
+**: Extension ID is `whardier.this-code`; marketplace name is "This Code"
+- [x] **EXT-02
+**: Extension sets `extensionKind: ["workspace"]` so it runs where files are (local or SSH remote)
+- [x] **EXT-03
+**: Extension activates on `onStartupFinished` (non-blocking, fires on every window)
+- [x] **EXT-04
+**: Extension has no UI — config-only with an Output Channel for diagnostics
+- [x] **EXT-05
+**: Extension exposes VS Code configuration settings (e.g., enable/disable recording, log level)
 
 ### Session Storage
 
-- [ ] **STOR-01**: Extension writes per-instance session state as a text/JSON file inside `~/.vscode-server/bin/{commit-hash}/which-code-session.json` (or `.vscode/` for local)
-- [ ] **STOR-02**: Extension maintains a SQLite index at `~/.which-code/sessions.db` (WAL mode, busy timeout) aggregating all instance state
+- [ ] **STOR-01**: Extension writes per-instance session state as a text/JSON file inside `~/.vscode-server/bin/{commit-hash}/this-code-session.json` (or `.vscode/` for local)
+- [ ] **STOR-02**: Extension maintains a SQLite index at `~/.this-code/sessions.db` (WAL mode, busy timeout) aggregating all instance state
 - [ ] **STOR-03**: SQLite schema includes: `id`, `recorded_at`, `workspace_path`, `user_data_dir`, `profile`, `server_commit_hash`, `server_bin_path`, `open_files` (JSON array)
 - [ ] **STOR-04**: Extension scans and indexes existing `~/.vscode-server/bin/*/` directories on activation to populate the SQLite index
-- [ ] **STOR-05**: Extension creates `~/.which-code/` directory on first activation if it does not exist
+- [ ] **STOR-05**: Extension creates `~/.this-code/` directory on first activation if it does not exist
 
 ### File Tracking
 
@@ -36,18 +41,18 @@
 - [ ] **CLI-03**: CLI intercepts `code` command when placed leftmost in PATH
 - [ ] **CLI-04**: CLI self-detects recursive invocation (environment variable guard + PATH stripping) before calling real `code`
 - [ ] **CLI-05**: CLI finds the real `code` binary by removing its own directory from PATH and using `which`/PATH resolution
-- [ ] **CLI-06**: CLI installs into a dedicated directory (`~/.which-code/bin/`) to avoid PATH pollution
+- [ ] **CLI-06**: CLI installs into a dedicated directory (`~/.this-code/bin/`) to avoid PATH pollution
 
 ### Shell Integration
 
 - [ ] **SHELL-01**: CLI provides `this-code init bash`, `this-code init zsh`, and `this-code init fish` subcommands that print shell-specific integration scripts
-- [ ] **SHELL-02**: Shell integration adds `~/.which-code/bin/` to leftmost PATH position
+- [ ] **SHELL-02**: Shell integration adds `~/.this-code/bin/` to leftmost PATH position
 - [ ] **SHELL-03**: Shell integration for zsh sets PATH in `~/.zshrc` (not `~/.zshenv`) to run after macOS `path_helper`
 - [ ] **SHELL-04**: Shell integration for fish uses `fish_add_path` (not `eval`)
 
 ### Session Querying
 
-- [ ] **QUERY-01**: CLI reads session state from text files in `~/.vscode-server/bin/*/` and/or `~/.which-code/sessions.db`
+- [ ] **QUERY-01**: CLI reads session state from text files in `~/.vscode-server/bin/*/` and/or `~/.this-code/sessions.db`
 - [ ] **QUERY-02**: CLI supports `this-code query [path]` to show last-known session for a given directory
 - [ ] **QUERY-03**: CLI supports `--dry-run` flag to print what it would do instead of executing
 - [ ] **QUERY-04**: v1 default behavior is pass-through only — CLI captures context and calls real `code` with original args (routing logic is v2)
@@ -61,7 +66,8 @@
 
 ### Platform
 
-- [ ] **PLAT-01**: macOS and Linux are primary supported platforms
+- [x] **PLAT-01
+**: macOS and Linux are primary supported platforms
 - [ ] **PLAT-02**: Windows support is best-effort (paths and shell integration may differ)
 
 ## v2 Requirements
@@ -84,59 +90,61 @@
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Intercepting `claude` command | v1 focuses on `code` interception; `claude` routing is deferred |
-| GUI / settings webview | Config-only extension; output channel is sufficient for v1 |
-| Windows as primary target | macOS and Linux path conventions (.vscode-server) are Unix-specific |
-| File-save triggers | Open/close events capture sufficient context without save noise |
-| Real-time IPC socket manipulation | `remote-code` works without this; complexity not justified |
+| Feature                           | Reason                                                              |
+| --------------------------------- | ------------------------------------------------------------------- |
+| Intercepting `claude` command     | v1 focuses on `code` interception; `claude` routing is deferred     |
+| GUI / settings webview            | Config-only extension; output channel is sufficient for v1          |
+| Windows as primary target         | macOS and Linux path conventions (.vscode-server) are Unix-specific |
+| File-save triggers                | Open/close events capture sufficient context without save noise     |
+| Real-time IPC socket manipulation | `remote-code` works without this; complexity not justified          |
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| EXT-01 | Phase 1 | Pending |
-| EXT-02 | Phase 1 | Pending |
-| EXT-03 | Phase 1 | Pending |
-| EXT-04 | Phase 1 | Pending |
-| EXT-05 | Phase 1 | Pending |
-| STOR-01 | Phase 1 | Pending |
-| STOR-02 | Phase 1 | Pending |
-| STOR-03 | Phase 1 | Pending |
-| STOR-04 | Phase 1 | Pending |
-| STOR-05 | Phase 1 | Pending |
-| TRACK-01 | Phase 1 | Pending |
-| TRACK-02 | Phase 1 | Pending |
-| TRACK-03 | Phase 1 | Pending |
-| TRACK-04 | Phase 1 | Pending |
-| TRACK-05 | Phase 1 | Pending |
-| CLI-01 | Phase 2 | Pending |
-| CLI-02 | Phase 2 | Pending |
-| CLI-03 | Phase 2 | Pending |
-| CLI-04 | Phase 2 | Pending |
-| CLI-05 | Phase 2 | Pending |
-| CLI-06 | Phase 2 | Pending |
-| SHELL-01 | Phase 2 | Pending |
-| SHELL-02 | Phase 2 | Pending |
-| SHELL-03 | Phase 2 | Pending |
-| SHELL-04 | Phase 2 | Pending |
-| QUERY-01 | Phase 3 | Pending |
-| QUERY-02 | Phase 3 | Pending |
-| QUERY-03 | Phase 3 | Pending |
-| QUERY-04 | Phase 3 | Pending |
-| PKG-01 | Phase 4 | Pending |
-| PKG-02 | Phase 4 | Pending |
-| PKG-03 | Phase 4 | Pending |
-| PKG-04 | Phase 4 | Pending |
-| PLAT-01 | Phase 1 | Pending |
-| PLAT-02 | Phase 2 | Pending |
+| Requirement | Phase   | Status  |
+| ----------- | ------- | ------- |
+| EXT-01      | Phase 1 | Pending |
+| EXT-02      | Phase 1 | Pending |
+| EXT-03      | Phase 1 | Pending |
+| EXT-04      | Phase 1 | Pending |
+| EXT-05      | Phase 1 | Pending |
+| STOR-01     | Phase 1 | Pending |
+| STOR-02     | Phase 1 | Pending |
+| STOR-03     | Phase 1 | Pending |
+| STOR-04     | Phase 1 | Pending |
+| STOR-05     | Phase 1 | Pending |
+| TRACK-01    | Phase 1 | Pending |
+| TRACK-02    | Phase 1 | Pending |
+| TRACK-03    | Phase 1 | Pending |
+| TRACK-04    | Phase 1 | Pending |
+| TRACK-05    | Phase 1 | Pending |
+| CLI-01      | Phase 2 | Pending |
+| CLI-02      | Phase 2 | Pending |
+| CLI-03      | Phase 2 | Pending |
+| CLI-04      | Phase 2 | Pending |
+| CLI-05      | Phase 2 | Pending |
+| CLI-06      | Phase 2 | Pending |
+| SHELL-01    | Phase 2 | Pending |
+| SHELL-02    | Phase 2 | Pending |
+| SHELL-03    | Phase 2 | Pending |
+| SHELL-04    | Phase 2 | Pending |
+| QUERY-01    | Phase 3 | Pending |
+| QUERY-02    | Phase 3 | Pending |
+| QUERY-03    | Phase 3 | Pending |
+| QUERY-04    | Phase 3 | Pending |
+| PKG-01      | Phase 4 | Pending |
+| PKG-02      | Phase 4 | Pending |
+| PKG-03      | Phase 4 | Pending |
+| PKG-04      | Phase 4 | Pending |
+| PLAT-01     | Phase 1 | Pending |
+| PLAT-02     | Phase 2 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 35 total
 - Mapped to phases: 35
 - Unmapped: 0 ✓
 
 ---
-*Requirements defined: 2026-04-25*
-*Last updated: 2026-04-25 after initial definition*
+
+_Requirements defined: 2026-04-25_
+_Last updated: 2026-04-25 after initial definition_

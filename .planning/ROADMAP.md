@@ -7,6 +7,7 @@ This Code ships in four phases following the data flow: extension writes session
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3, 4): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -20,18 +21,21 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Extension Core + Storage Foundation
+
 **Goal**: Extension silently records session metadata wherever VS Code runs, producing inspectable JSON files and a queryable SQLite database
 **Depends on**: Nothing (first phase)
 **Requirements**: EXT-01, EXT-02, EXT-03, EXT-04, EXT-05, STOR-01, STOR-02, STOR-03, STOR-04, STOR-05, TRACK-01, TRACK-02, TRACK-03, TRACK-04, TRACK-05, PLAT-01
 **Success Criteria** (what must be TRUE):
-  1. After opening a workspace in VS Code, a JSON file exists at `~/.vscode-server/bin/{hash}/this-code-session.json` (SSH remote) or `~/.this-code/sessions/{hash}.json` (local) containing workspace path, server commit hash, user-data-dir, profile, and open files
-  2. After opening a workspace, `~/.this-code/sessions.db` contains a row with matching session data queryable via `sqlite3` CLI
-  3. Opening and closing files in the editor updates the `open_files` array in the SQLite row within seconds
-  4. Extension produces no visible UI — only an Output Channel entry appears under "This Code" with activation and event diagnostics
-  5. Extension activates on both local and SSH Remote workspaces (extensionKind workspace behavior confirmed)
-**Plans**: 7 plans
+
+1. After opening a workspace in VS Code, a JSON file exists at `~/.vscode-server/bin/{hash}/this-code-session.json` (SSH remote) or `~/.this-code/sessions/{hash}.json` (local) containing workspace path, server commit hash, user-data-dir, profile, and open files
+2. After opening a workspace, `~/.this-code/sessions.db` contains a row with matching session data queryable via `sqlite3` CLI
+3. Opening and closing files in the editor updates the `open_files` array in the SQLite row within seconds
+4. Extension produces no visible UI — only an Output Channel entry appears under "This Code" with activation and event diagnostics
+5. Extension activates on both local and SSH Remote workspaces (extensionKind workspace behavior confirmed)
+   **Plans**: 7 plans
 
 Plans:
+
 - [ ] 01-01-PLAN.md — Scaffold extension/ directory: package.json, tsconfig, esbuild, test infrastructure, npm install
 - [ ] 01-02-PLAN.md — Database layer: @vscode/sqlite3 Promise wrapper, WAL mode, schema migration (STOR-02, STOR-03, STOR-05)
 - [ ] 01-03-PLAN.md — Session recording: collectSessionMetadata, getSessionJsonPath, writeSessionJson (STOR-01, STOR-05, TRACK-01–03)
@@ -41,46 +45,52 @@ Plans:
 - [ ] 01-07-PLAN.md — CI matrix: GitHub Actions macOS-latest + ubuntu-latest, typecheck + build + manifest verify (PLAT-01)
 
 ### Phase 2: Rust CLI + Shell Integration
+
 **Goal**: A Rust binary installs into `~/.this-code/bin/` and shell integration scripts make it available as the leftmost `code` in PATH
 **Depends on**: Phase 1
 **Requirements**: CLI-01, CLI-02, CLI-03, CLI-04, CLI-05, CLI-06, SHELL-01, SHELL-02, SHELL-03, SHELL-04, PLAT-02
 **Success Criteria** (what must be TRUE):
-  1. Running `this-code` from a terminal prints help/version output confirming the Rust binary is functional
-  2. After running `eval "$(this-code init zsh)"` (or bash/fish equivalent), `which code` resolves to `~/.this-code/bin/code` (or the this-code shim)
-  3. Running the `code` shim invokes the real VS Code `code` binary without infinite recursion, even when called repeatedly
-  4. Running the `code` shim with `THIS_CODE_ACTIVE=1` already set (or equivalent guard) correctly passes through without double-processing
-  5. On macOS with zsh, the shim remains leftmost in PATH even after opening a new terminal (survives `path_helper`)
-**Plans**: TBD
+
+1. Running `this-code` from a terminal prints help/version output confirming the Rust binary is functional
+2. After running `eval "$(this-code init zsh)"` (or bash/fish equivalent), `This Code` resolves to `~/.this-code/bin/code` (or the this-code shim)
+3. Running the `code` shim invokes the real VS Code `code` binary without infinite recursion, even when called repeatedly
+4. Running the `code` shim with `THIS_CODE_ACTIVE=1` already set (or equivalent guard) correctly passes through without double-processing
+5. On macOS with zsh, the shim remains leftmost in PATH even after opening a new terminal (survives `path_helper`)
+   **Plans**: TBD
 
 ### Phase 3: Session Querying + Pass-Through
+
 **Goal**: CLI can query session history and route code invocations through to the real binary with full context awareness
 **Depends on**: Phase 2
 **Requirements**: QUERY-01, QUERY-02, QUERY-03, QUERY-04
 **Success Criteria** (what must be TRUE):
-  1. Running `this-code query /path/to/project` returns the last-known session for that directory (workspace, profile, user-data-dir, timestamp)
-  2. Running `this-code query /path/to/project --dry-run` prints what the CLI would do without executing anything
-  3. Running `code /path/to/project` via the shim passes through to the real `code` binary with original arguments (v1 default behavior)
-  4. CLI reads session data from both `~/.vscode-server/bin/*/` JSON files and `~/.this-code/sessions.db` (dual-source)
-**Plans**: TBD
+
+1. Running `this-code query /path/to/project` returns the last-known session for that directory (workspace, profile, user-data-dir, timestamp)
+2. Running `this-code query /path/to/project --dry-run` prints what the CLI would do without executing anything
+3. Running `code /path/to/project` via the shim passes through to the real `code` binary with original arguments (v1 default behavior)
+4. CLI reads session data from both `~/.vscode-server/bin/*/` JSON files and `~/.this-code/sessions.db` (dual-source)
+   **Plans**: TBD
 
 ### Phase 4: Packaging + Distribution
+
 **Goal**: Users can install This Code from the VS Code Marketplace or GitHub Releases on any supported platform
 **Depends on**: Phase 3
 **Requirements**: PKG-01, PKG-02, PKG-03, PKG-04
 **Success Criteria** (what must be TRUE):
-  1. Running `vsce package --target darwin-arm64` (and the other 3 targets) produces a valid VSIX file containing the correct native SQLite binary and Rust CLI binary for that platform
-  2. A GitHub Actions workflow builds all 4 platform VSIX packages on a tagged release without manual intervention
-  3. The extension is installable from the VS Code Marketplace as `whardier.this-code` and activates correctly on the target platform
-**Plans**: TBD
+
+1. Running `vsce package --target darwin-arm64` (and the other 3 targets) produces a valid VSIX file containing the correct native SQLite binary and Rust CLI binary for that platform
+2. A GitHub Actions workflow builds all 4 platform VSIX packages on a tagged release without manual intervention
+3. The extension is installable from the VS Code Marketplace as `whardier.this-code` and activates correctly on the target platform
+   **Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
 Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Extension Core + Storage Foundation | 0/7 | Planned | - |
-| 2. Rust CLI + Shell Integration | 0/? | Not started | - |
-| 3. Session Querying + Pass-Through | 0/? | Not started | - |
-| 4. Packaging + Distribution | 0/? | Not started | - |
+| Phase                                  | Plans Complete | Status      | Completed |
+| -------------------------------------- | -------------- | ----------- | --------- |
+| 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
+| 2. Rust CLI + Shell Integration        | 0/?            | Not started | -         |
+| 3. Session Querying + Pass-Through     | 0/?            | Not started | -         |
+| 4. Packaging + Distribution            | 0/?            | Not started | -         |
