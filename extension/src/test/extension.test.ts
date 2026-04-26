@@ -51,16 +51,92 @@ suite("STOR-01: Per-instance JSON", () => {
 });
 
 suite("STOR-02: SQLite WAL mode", () => {
-  test("TODO: sessions.db exists with journal_mode=wal", () => {
-    // Plan 02 fills this assertion
-    assert.ok(true, "stub — implement in Plan 02");
+  test("sessions.db created with journal_mode=wal after initDatabase()", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    await fs.mkdir(tmpDir, { recursive: true });
+    const dbPath = path.join(tmpDir, "test.db");
+
+    const db = new Database(dbPath);
+    await initDatabase(db);
+
+    const row = await db.get("PRAGMA journal_mode");
+    assert.strictEqual(
+      (row as any).journal_mode,
+      "wal",
+      "journal_mode must be wal",
+    );
+
+    await db.close();
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
 suite("STOR-03: Schema columns", () => {
-  test("TODO: invocations table has all required columns", () => {
-    // Plan 02 fills this assertion
-    assert.ok(true, "stub — implement in Plan 02");
+  test("invocations table has all required columns", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    await fs.mkdir(tmpDir, { recursive: true });
+    const dbPath = path.join(tmpDir, "test.db");
+
+    const db = new Database(dbPath);
+    await initDatabase(db);
+
+    const rows = (await db.all("PRAGMA table_info(invocations)")) as Array<{
+      name: string;
+    }>;
+    const columns = rows.map((r) => r.name).sort();
+    const expected = [
+      "id",
+      "invoked_at",
+      "workspace_path",
+      "user_data_dir",
+      "profile",
+      "local_ide_path",
+      "remote_name",
+      "remote_server_path",
+      "server_commit_hash",
+      "server_bin_path",
+      "open_files",
+    ].sort();
+    assert.deepStrictEqual(
+      columns,
+      expected,
+      "invocations columns must match schema (D-07/STOR-03)",
+    );
+
+    // Verify user_version is 1 (idempotent migration marker)
+    const vRow = (await db.get("PRAGMA user_version")) as any;
+    assert.strictEqual(vRow.user_version, 1);
+
+    await db.close();
+    await fs.rm(tmpDir, { recursive: true, force: true });
+  });
+
+  test("initDatabase is idempotent — calling twice does not throw", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    await fs.mkdir(tmpDir, { recursive: true });
+    const dbPath = path.join(tmpDir, "test.db");
+
+    const db = new Database(dbPath);
+    await initDatabase(db);
+    await initDatabase(db); // second call must not throw
+
+    await db.close();
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
