@@ -38,8 +38,10 @@
 **: Extension records VS Code Server commit hash (parsed from `vscode.env.appRoot` or equivalent)
 - [x] **TRACK-03
 **: Extension records `--user-data-dir` and `--profile` associated with this instance (via `globalStorageUri` path parsing or config)
-- [ ] **TRACK-04**: Extension records open file manifest (file paths) on `onDidOpenTextDocument` and `onDidCloseTextDocument` events
-- [ ] **TRACK-05**: Extension does NOT trigger on file save — open/close events only
+- [x] **TRACK-04
+**: Extension records open file manifest (file paths) on `onDidOpenTextDocument` and `onDidCloseTextDocument` events
+- [x] **TRACK-05
+**: Extension does NOT trigger on file save — open/close events only
 
 ### CLI Binary
 
