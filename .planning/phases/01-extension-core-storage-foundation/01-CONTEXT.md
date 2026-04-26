@@ -39,6 +39,10 @@ VS Code extension silently records session metadata wherever VS Code runs (local
   - Figment config file (Phase 2): `~/.this-code/config.toml`
   - **Note:** `.planning/REQUIREMENTS.md` and `.planning/PROJECT.md` still say `~/.which-code/` — downstream agents should treat D-06 as the authoritative correction.
 
+### Schema Column Names and STOR-03 Columns (STOR-03)
+- **D-07:** The invocations table uses `invoked_at` as the timestamp column name (not `recorded_at` as written in REQUIREMENTS.md STOR-03). `invoked_at` matches the STACK.md locked schema and is what the Rust CLI (Phase 2) reads. Additionally, `server_commit_hash TEXT` and `server_bin_path TEXT` are retained as explicit nullable columns in the schema per STOR-03 — they are NOT dropped or derived from other columns. Final 11-column schema:
+  - `id`, `invoked_at`, `workspace_path`, `user_data_dir`, `profile`, `local_ide_path`, `remote_name`, `remote_server_path`, `server_commit_hash`, `server_bin_path`, `open_files`
+
 ### Claude's Discretion
 - Startup scan aggressiveness for STOR-04 (incremental scan that skips already-indexed paths is preferred over a full rescan)
 - Exact log lines emitted per event to the output channel
@@ -53,7 +57,7 @@ VS Code extension silently records session metadata wherever VS Code runs (local
 **Downstream agents MUST read these before planning or implementing.**
 
 ### Requirements
-- `.planning/REQUIREMENTS.md` — Full requirement list; EXT-01 through EXT-05, STOR-01 through STOR-05, TRACK-01 through TRACK-05, PLAT-01 are all in scope for Phase 1. Note: all `~/.which-code/` paths in this file are superseded by D-06 above (`~/.this-code/`).
+- `.planning/REQUIREMENTS.md` — Full requirement list; EXT-01 through EXT-05, STOR-01 through STOR-05, TRACK-01 through TRACK-05, PLAT-01 are all in scope for Phase 1. Note: all `~/.which-code/` paths in this file are superseded by D-06 above (`~/.this-code/`). Column name `recorded_at` in STOR-03 is superseded by D-07 (`invoked_at`).
 
 ### Research
 - `.planning/research/SUMMARY.md` — Resolved decisions, architecture approach, confidence assessment
@@ -105,3 +109,4 @@ VS Code extension silently records session metadata wherever VS Code runs (local
 
 *Phase: 01-extension-core-storage-foundation*
 *Context gathered: 2026-04-25*
+*Revised: 2026-04-25 — added D-07 (invoked_at column name + server_commit_hash/server_bin_path retained per STOR-03)*
