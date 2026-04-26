@@ -1,0 +1,49 @@
+{
+  "name": "this-code",
+  "displayName": "This Code",
+  "description": "Session tracking for VS Code launch context and open file manifests",
+  "version": "0.1.0",
+  "publisher": "whardier",
+  "engines": { "vscode": "^1.75.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "extensionKind": ["workspace"],
+  "contributes": {
+    "configuration": {
+      "title": "This Code",
+      "properties": {
+        "thisCode.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable session recording."
+        },
+        "thisCode.logLevel": {
+          "type": "string",
+          "enum": ["off", "info", "debug"],
+          "default": "info",
+          "description": "Output channel verbosity."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "build:prod": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vscode-test",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "@vscode/sqlite3": "^5.1.12-vscode"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "typescript": "~5.7.0",
+    "esbuild": "^0.28.0",
+    "@vscode/vsce": "^3.9.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}

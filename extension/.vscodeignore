@@ -1,0 +1,10 @@
+.vscode/**
+.vscode-test/**
+src/**
+out/**
+node_modules/**
+!node_modules/@vscode/sqlite3/**
+*.ts
+tsconfig.json
+esbuild.js
+.gitignore
