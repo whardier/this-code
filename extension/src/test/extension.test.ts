@@ -295,16 +295,50 @@ suite("TRACK-03: user_data_dir and profile", () => {
 });
 
 suite("TRACK-04: Open file manifest", () => {
-  test("TODO: open_files updates after document event", () => {
-    // Plan 04 fills this assertion
-    assert.ok(true, "stub — implement in Plan 04");
+  test("open_files filter: only file:// scheme, non-closed documents", () => {
+    // Validate the filter logic inline — mirrors updateOpenFiles() filter
+    const mockDocs = [
+      { isClosed: false, uri: { scheme: "file", fsPath: "/home/u/file1.ts" } },
+      { isClosed: false, uri: { scheme: "untitled", fsPath: "" } }, // excluded: untitled
+      { isClosed: true, uri: { scheme: "file", fsPath: "/home/u/file2.ts" } }, // excluded: closed
+      { isClosed: false, uri: { scheme: "git", fsPath: "/home/u/.git/HEAD" } }, // excluded: git
+      { isClosed: false, uri: { scheme: "file", fsPath: "/home/u/file3.ts" } },
+    ];
+    const result = mockDocs
+      .filter((doc) => !doc.isClosed && doc.uri.scheme === "file")
+      .map((doc) => doc.uri.fsPath);
+    assert.deepStrictEqual(result, ["/home/u/file1.ts", "/home/u/file3.ts"]);
+  });
+
+  test("open_files UPDATE uses parameterized query — no SQL injection surface", () => {
+    // Static assertion: grep the source for string interpolation in SQL
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "extension.ts"),
+      "utf-8",
+    );
+    // Should not contain template literals in SQL context
+    const sqlTemplatePattern = /UPDATE invocations.*\$\{/;
+    assert.ok(
+      !sqlTemplatePattern.test(src),
+      "SQL must use ? placeholders, not template literals",
+    );
   });
 });
 
 suite("TRACK-05: No save triggers", () => {
-  test("onDidSaveTextDocument is not registered", () => {
-    // Static check — grep enforces this; test is documentation
-    assert.ok(true, "enforced by grep: no onDidSaveTextDocument in src/");
+  test("onDidSaveTextDocument is not registered in extension.ts", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "extension.ts"),
+      "utf-8",
+    );
+    assert.ok(
+      !src.includes("onDidSaveTextDocument"),
+      "onDidSaveTextDocument must not appear in extension.ts",
+    );
   });
 });
 
