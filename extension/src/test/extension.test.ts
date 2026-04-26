@@ -44,9 +44,40 @@ suite("EXT-05: Two configuration settings", () => {
 });
 
 suite("STOR-01: Per-instance JSON", () => {
-  test("TODO: JSON file written at correct path after activation", () => {
-    // Plan 03 fills this assertion
-    assert.ok(true, "stub — implement in Plan 03");
+  test("JSON file contains all SessionMetadata fields", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { writeSessionJson } = require("../storage");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    const filePath = path.join(tmpDir, "test-session.json");
+    const metadata = {
+      workspace_path: "/home/user/myproject",
+      user_data_dir: "/home/user/.config/Code",
+      profile: null,
+      local_ide_path: "/home/user/.vscode-server/bin/abc123/resources/app",
+      remote_name: "ssh-remote",
+      remote_server_path: "/home/user/.vscode-server/bin/abc123",
+      server_commit_hash: "a".repeat(40),
+      local_session_hash: "deadbeef12345678",
+    };
+
+    await writeSessionJson(filePath, metadata);
+    const raw = await fs.readFile(filePath, "utf-8");
+    const parsed = JSON.parse(raw);
+
+    assert.strictEqual(parsed.workspace_path, "/home/user/myproject");
+    assert.strictEqual(parsed.remote_name, "ssh-remote");
+    assert.strictEqual(parsed.server_commit_hash, "a".repeat(40));
+    assert.deepStrictEqual(parsed.open_files, []);
+    assert.strictEqual(parsed.schema_version, 1);
+    assert.ok(
+      typeof parsed.recorded_at === "string",
+      "recorded_at must be a string timestamp",
+    );
+
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
@@ -148,30 +179,118 @@ suite("STOR-04: Startup scan", () => {
 });
 
 suite("STOR-05: ~/.this-code directory creation", () => {
-  test("TODO: directory created on first activation", () => {
-    // Plan 03 fills this assertion
-    assert.ok(true, "stub — implement in Plan 03");
+  test("writeSessionJson creates parent directory if absent", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { writeSessionJson } = require("../storage");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    // Do NOT create tmpDir — writeSessionJson must create it
+    const filePath = path.join(tmpDir, "sessions", "abc123.json");
+    const metadata = {
+      workspace_path: "/tmp/workspace",
+      user_data_dir: "/tmp/userdata",
+      profile: null,
+      local_ide_path: "/tmp/vscode",
+      remote_name: null,
+      remote_server_path: null,
+      server_commit_hash: null,
+      local_session_hash: "abc123def456abcd",
+    };
+
+    await writeSessionJson(filePath, metadata);
+    const stat = await fs.stat(filePath);
+    assert.ok(stat.isFile(), "session JSON must exist after writeSessionJson");
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
 suite("TRACK-01: Workspace path", () => {
-  test("TODO: workspace_path recorded in SQLite", () => {
-    // Plan 03 fills this assertion
-    assert.ok(true, "stub — implement in Plan 03");
+  test("workspace_path written to session JSON", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { writeSessionJson } = require("../storage");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    const filePath = path.join(tmpDir, "track01.json");
+    const metadata = {
+      workspace_path: "/home/user/my-workspace",
+      user_data_dir: null,
+      profile: null,
+      local_ide_path: "/vscode",
+      remote_name: null,
+      remote_server_path: null,
+      server_commit_hash: null,
+      local_session_hash: "0000000000000000",
+    };
+    await writeSessionJson(filePath, metadata);
+    const parsed = JSON.parse(await fs.readFile(filePath, "utf-8"));
+    assert.strictEqual(parsed.workspace_path, "/home/user/my-workspace");
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
 suite("TRACK-02: Commit hash", () => {
-  test("TODO: server_commit_hash is 40-char hex or null", () => {
-    // Plan 03 fills this assertion
-    assert.ok(true, "stub — implement in Plan 03");
+  test("server_commit_hash is 40-char hex or null in session JSON", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { writeSessionJson } = require("../storage");
+
+    const hash40 = "a1b2c3d4e5f6".repeat(3) + "a1b2c3d4"; // 40 chars
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    const filePath = path.join(tmpDir, "track02.json");
+    const metadata = {
+      workspace_path: null,
+      user_data_dir: null,
+      profile: null,
+      local_ide_path: "/vscode",
+      remote_name: "ssh-remote",
+      remote_server_path: `/home/u/.vscode-server/bin/${hash40}`,
+      server_commit_hash: hash40,
+      local_session_hash: "0000000000000000",
+    };
+    await writeSessionJson(filePath, metadata);
+    const parsed = JSON.parse(await fs.readFile(filePath, "utf-8"));
+    assert.ok(
+      parsed.server_commit_hash === null ||
+        /^[0-9a-f]{40}$/i.test(parsed.server_commit_hash),
+      "server_commit_hash must be 40-char hex or null",
+    );
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
 suite("TRACK-03: user_data_dir and profile", () => {
-  test("TODO: user_data_dir non-null; profile null-safe", () => {
-    // Plan 03 fills this assertion
-    assert.ok(true, "stub — implement in Plan 03");
+  test("profile is null when not parseable (D-01)", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { writeSessionJson } = require("../storage");
+
+    const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
+    const filePath = path.join(tmpDir, "track03.json");
+    const metadata = {
+      workspace_path: null,
+      user_data_dir: "/home/u/.config/Code",
+      profile: null, // null per D-01
+      local_ide_path: "/vscode",
+      remote_name: null,
+      remote_server_path: null,
+      server_commit_hash: null,
+      local_session_hash: "0000000000000000",
+    };
+    await writeSessionJson(filePath, metadata);
+    const parsed = JSON.parse(await fs.readFile(filePath, "utf-8"));
+    assert.strictEqual(
+      parsed.profile,
+      null,
+      "profile must be null when not parseable",
+    );
+    assert.strictEqual(parsed.user_data_dir, "/home/u/.config/Code");
+    await fs.rm(tmpDir, { recursive: true, force: true });
   });
 });
 
