@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and typecheck (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: extension/package-lock.json
+
+      - name: Install dependencies
+        working-directory: extension
+        run: npm ci
+
+      - name: TypeScript typecheck
+        working-directory: extension
+        run: npx tsc --noEmit
+
+      - name: Build extension bundle
+        working-directory: extension
+        run: npm run build
+
+      - name: Verify manifest
+        working-directory: extension
+        run: |
+          node -e "
+            const p = require('./package.json');
+            const id = p.publisher + '.' + p.name;
+            if (id !== 'whardier.this-code') throw new Error('Wrong ID: ' + id);
+            if (JSON.stringify(p.extensionKind) !== '[\"workspace\"]') throw new Error('extensionKind wrong');
+            if (!p.activationEvents.includes('onStartupFinished')) throw new Error('activationEvents wrong');
+            if (p.contributes.commands) throw new Error('commands must not exist');
+            const keys = Object.keys(p.contributes.configuration.properties).sort().join(',');
+            if (keys !== 'thisCode.enable,thisCode.logLevel') throw new Error('settings wrong: ' + keys);
+            console.log('Manifest OK:', id);
+          "
+
+      - name: Verify dist output
+        working-directory: extension
+        run: test -f dist/extension.js && echo "dist/extension.js exists"
+
+      - name: Check no save trigger
+        working-directory: extension
+        run: |
+          if grep -r "onDidSaveTextDocument" src/; then
+            echo "ERROR: onDidSaveTextDocument found in source — TRACK-05 violation"
+            exit 1
+          fi
+          echo "TRACK-05 OK: no onDidSaveTextDocument"
+
+# Note: Full integration tests (npm run test via @vscode/test-electron) require
+# Xvfb on Linux (virtual framebuffer) and a real GUI session. That setup is
+# deferred to Phase 4 (Marketplace packaging). Phase 1 CI validates:
+# typecheck, build, manifest checks, and static source assertions.
