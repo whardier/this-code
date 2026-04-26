@@ -172,9 +172,133 @@ suite("STOR-03: Schema columns", () => {
 });
 
 suite("STOR-04: Startup scan", () => {
-  test("TODO: existing session JSONs indexed on activation", () => {
-    // Plan 05 fills this assertion
-    assert.ok(true, "stub — implement in Plan 05");
+  test("pre-seeded session JSON in tmp binDir is indexed into SQLite on scan", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+    const { scanExistingRemoteSessions } = require("../storage");
+
+    // Create temp dir structure: tmpBinDir/{fakeHash}/this-code-session.json
+    const tmpRoot = path.join(os.tmpdir(), "this-code-stor04-" + Date.now());
+    const fakeHash = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"; // 40 chars
+    const fakeBinDir = path.join(tmpRoot, "bin");
+    const serverEntryDir = path.join(fakeBinDir, fakeHash);
+    await fs.mkdir(serverEntryDir, { recursive: true });
+
+    // Write fixture session JSON
+    const sessionData = {
+      schema_version: 1,
+      recorded_at: new Date().toISOString(),
+      workspace_path: "/home/testuser/myproject",
+      user_data_dir: "/home/testuser/.config/Code",
+      profile: null,
+      local_ide_path:
+        "/home/testuser/.vscode-server/bin/" + fakeHash + "/resources/app",
+      remote_name: "ssh-remote",
+      remote_server_path: serverEntryDir,
+      server_commit_hash: fakeHash,
+      server_bin_path: serverEntryDir,
+      open_files: ["/home/testuser/myproject/index.ts"],
+    };
+    await fs.writeFile(
+      path.join(serverEntryDir, "this-code-session.json"),
+      JSON.stringify(sessionData),
+      "utf-8",
+    );
+
+    // Create temp DB, init schema
+    const dbPath = path.join(tmpRoot, "test.db");
+    const db = new Database(dbPath);
+    await initDatabase(db);
+
+    // No row before scan
+    const before = await db.get(
+      "SELECT id FROM invocations WHERE remote_server_path = ? LIMIT 1",
+      [serverEntryDir],
+    );
+    assert.strictEqual(before, undefined, "no row before scan");
+
+    // Run scan pointing at tmp binDir — does NOT touch real ~/.vscode-server
+    await scanExistingRemoteSessions(db, fakeBinDir);
+
+    // Row exists after scan
+    const after = (await db.get(
+      "SELECT id, workspace_path, server_commit_hash FROM invocations WHERE remote_server_path = ? LIMIT 1",
+      [serverEntryDir],
+    )) as any;
+    assert.ok(after, "row must exist after scan");
+    assert.strictEqual(after.workspace_path, "/home/testuser/myproject");
+    assert.strictEqual(after.server_commit_hash, fakeHash);
+
+    await db.close();
+    await fs.rm(tmpRoot, { recursive: true, force: true });
+  });
+
+  test("scan is incremental — calling twice on same data inserts only one row", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+    const { scanExistingRemoteSessions } = require("../storage");
+
+    const tmpRoot = path.join(os.tmpdir(), "this-code-stor04b-" + Date.now());
+    const fakeHash = "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3";
+    const fakeBinDir = path.join(tmpRoot, "bin");
+    const serverEntryDir = path.join(fakeBinDir, fakeHash);
+    await fs.mkdir(serverEntryDir, { recursive: true });
+
+    await fs.writeFile(
+      path.join(serverEntryDir, "this-code-session.json"),
+      JSON.stringify({
+        workspace_path: "/proj",
+        local_ide_path: "/ide",
+        open_files: [],
+      }),
+      "utf-8",
+    );
+
+    const db = new Database(path.join(tmpRoot, "test.db"));
+    await initDatabase(db);
+
+    await scanExistingRemoteSessions(db, fakeBinDir);
+    await scanExistingRemoteSessions(db, fakeBinDir); // second call — must not insert duplicate
+
+    const rows = (await db.all(
+      "SELECT id FROM invocations WHERE remote_server_path = ?",
+      [serverEntryDir],
+    )) as any[];
+    assert.strictEqual(
+      rows.length,
+      1,
+      "dedup: exactly one row after two scans",
+    );
+
+    await db.close();
+    await fs.rm(tmpRoot, { recursive: true, force: true });
+  });
+
+  test("scanExistingRemoteSessions does not throw when binDir does not exist", async () => {
+    const os = require("os");
+    const path = require("path");
+    const fs = require("fs/promises");
+    const { Database, initDatabase } = require("../db");
+    const { scanExistingRemoteSessions } = require("../storage");
+
+    const tmpRoot = path.join(os.tmpdir(), "this-code-stor04c-" + Date.now());
+    await fs.mkdir(tmpRoot, { recursive: true });
+    const db = new Database(path.join(tmpRoot, "test.db"));
+    await initDatabase(db);
+
+    // Point at a non-existent directory — must not throw
+    const nonExistent = path.join(tmpRoot, "does-not-exist", "bin");
+    await assert.doesNotReject(
+      () => scanExistingRemoteSessions(db, nonExistent),
+      "scanExistingRemoteSessions must not throw when binDir is absent",
+    );
+
+    await db.close();
+    await fs.rm(tmpRoot, { recursive: true, force: true });
   });
 });
 
