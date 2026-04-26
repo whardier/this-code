@@ -196,6 +196,56 @@ suite("PLAT-01: macOS and Linux", () => {
   });
 });
 
+// --- Plan 03 TDD: Session helper unit tests (RED phase) ---
+
+suite("SESSION-HELPERS: extractCommitHash via getSessionJsonPath", () => {
+  test("SSH remote appRoot produces session JSON path under .vscode-server/bin/{hash}", () => {
+    const { getSessionJsonPath } = require("../session");
+    const hash40 = "abc123def456".repeat(3) + "abc123de"; // 40 chars
+    // We verify that when remote_name is set and server_commit_hash is the 40-char hash,
+    // the path ends with .vscode-server/bin/{hash}/this-code-session.json
+    const metadata = {
+      workspace_path: null,
+      user_data_dir: null,
+      profile: null,
+      local_ide_path: `/home/u/.vscode-server/bin/${hash40}/resources/app`,
+      remote_name: "ssh-remote",
+      remote_server_path: `/home/u/.vscode-server/bin/${hash40}`,
+      server_commit_hash: hash40,
+      local_session_hash: "0000000000000000",
+    };
+    const result = getSessionJsonPath(metadata);
+    assert.ok(
+      result.includes(`.vscode-server/bin/${hash40}/this-code-session.json`) ||
+        result.endsWith("this-code-session.json"),
+      `Expected path under .vscode-server/bin/${hash40}, got: ${result}`,
+    );
+  });
+
+  test("Local appRoot produces session JSON path under ~/.this-code/sessions/{16-char-hash}.json", () => {
+    const { getSessionJsonPath } = require("../session");
+    const metadata = {
+      workspace_path: null,
+      user_data_dir: null,
+      profile: null,
+      local_ide_path: "/Applications/Visual Studio Code.app/Contents/Resources/app",
+      remote_name: null,
+      remote_server_path: null,
+      server_commit_hash: null,
+      local_session_hash: "deadbeef12345678",
+    };
+    const result = getSessionJsonPath(metadata);
+    assert.ok(
+      result.includes(".this-code") && result.includes("sessions"),
+      `Expected path under ~/.this-code/sessions/, got: ${result}`,
+    );
+    assert.ok(
+      result.endsWith("deadbeef12345678.json"),
+      `Expected filename deadbeef12345678.json, got: ${result}`,
+    );
+  });
+});
+
 // Suppress unused import warnings — these will be used in later plans
 void path;
 void os;
