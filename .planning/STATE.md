@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-04-PLAN.md — updateOpenFiles() D-02 pattern, TRACK-04 and TRACK-05 test stubs replaced, 2 commits
-last_updated: "2026-04-26T21:48:54.511Z"
+stopped_at: Completed 01-05-PLAN.md — scanExistingRemoteSessions() full implementation, STOR-04 test stub replaced, 2 TDD commits
+last_updated: "2026-04-26T21:53:22.543Z"
 last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 7
-  completed_plans: 4
-  percent: 57
+  completed_plans: 5
+  percent: 71
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 
-Progress: [██████░░░░] 57%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P02 | 113 | 2 tasks | 2 files |
 | Phase 01-extension-core-storage-foundation P03 | 196 | 2 tasks | 3 files |
 | Phase 01-extension-core-storage-foundation P04 | 161 | 2 tasks | 2 files |
+| Phase 01-extension-core-storage-foundation P05 | 119 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,7 @@ Recent decisions affecting current work:
 - schema_version:1 field in JSON enables future CLI format detection
 - updateOpenFiles() uses D-02 rebuild pattern — reads vscode.workspace.textDocuments fresh on every event, filters !isClosed && scheme==='file'
 - parameterized UPDATE query (? placeholders) in updateOpenFiles — no template literals in SQL (T-04-01 mitigation)
+- Injectable binDir parameter in scanExistingRemoteSessions() enables deterministic testing without home dir access — entryDir used as authoritative dedup key (not JSON field value)
 
 ### Pending Todos
 
@@ -89,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T21:48:54.499Z
-Stopped at: Completed 01-04-PLAN.md — updateOpenFiles() D-02 pattern, TRACK-04 and TRACK-05 test stubs replaced, 2 commits
+Last session: 2026-04-26T21:53:22.530Z
+Stopped at: Completed 01-05-PLAN.md — scanExistingRemoteSessions() full implementation, STOR-04 test stub replaced, 2 TDD commits
 Resume file: None
