@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-06-PLAN.md — OutputChannel logging integration, logLevel-gating, D-01 globalStorageUri validation, 1 task
-last_updated: "2026-04-26T21:57:16.775Z"
+stopped_at: Completed 01-07-PLAN.md — CI workflow, PLAT-01 test, REQUIREMENTS.md STOR-03 correction, 3 tasks + 1 bug fix
+last_updated: "2026-04-26T22:03:26.707Z"
 last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
 
-Progress: [█████████░] 86%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P04 | 161 | 2 tasks | 2 files |
 | Phase 01-extension-core-storage-foundation P05 | 119 | 2 tasks | 2 files |
 | Phase 01-extension-core-storage-foundation P06 | 97 | 1 tasks | 1 files |
+| Phase 01-extension-core-storage-foundation P07 | 215 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - Injectable binDir parameter in scanExistingRemoteSessions() enables deterministic testing without home dir access — entryDir used as authoritative dedup key (not JSON field value)
 - getLogLevel imported at module level via ES import in extension.ts — not inline require — enables live config reads on every log() call
 - Always-emit pattern for disabled and activation-failure messages in extension.ts — bypasses logLevel gate so users always know why extension is inactive
+- GitHub Actions CI matrix on macos-latest and ubuntu-latest with fail-fast: false — both platforms verified independently on every push
+- TRACK-05 grep uses --exclude-dir=test to avoid false positive from test assertion string literal
+- Full npm test (VS Code integration tests) deferred to Phase 4 — Xvfb on Linux required; Phase 1 CI validates typecheck + build + static checks
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-26T21:57:16.762Z
-Stopped at: Completed 01-06-PLAN.md — OutputChannel logging integration, logLevel-gating, D-01 globalStorageUri validation, 1 task
+Last session: 2026-04-26T22:03:26.694Z
+Stopped at: Completed 01-07-PLAN.md — CI workflow, PLAT-01 test, REQUIREMENTS.md STOR-03 correction, 3 tasks + 1 bug fix
 Resume file: None
