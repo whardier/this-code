@@ -571,24 +571,26 @@ suite("SESSION-HELPERS: extractCommitHash via getSessionJsonPath", () => {
     const hash40 = "10c8e557c8b9f9ed0a87f61f1c9a44bde731c409";
     // Simulates the new VS Code Server path structure observed in UAT
     const stablePath = `/Users/testuser/.vscode-server/cli/servers/Stable-${hash40}/server`;
+    // remote_server_path as produced by fixed extractServerBinPath() for cli/servers structure
+    const serverBinPath = `/Users/testuser/.vscode-server/cli/servers/Stable-${hash40}`;
     const metadata = {
       workspace_path: "/Users/testuser/myproject",
       user_data_dir: "/Users/testuser/.vscode-server/data",
       profile: null,
       local_ide_path: stablePath,
       remote_name: "ssh-remote",
-      remote_server_path: null,
-      server_commit_hash: hash40,  // as would be set by fixed extractCommitHash()
+      remote_server_path: serverBinPath,
+      server_commit_hash: hash40,
       local_session_hash: "deadbeef12345678",
     };
     const result = getSessionJsonPath(metadata);
     assert.ok(
-      result.includes(`.vscode-server`) && result.endsWith("this-code-session.json"),
-      `Expected SSH remote JSON path, got: ${result}`,
+      result.includes("cli/servers") && result.endsWith("this-code-session.json"),
+      `Expected cli/servers JSON path, got: ${result}`,
     );
     assert.ok(
-      result.includes(hash40),
-      `Expected path to contain commit hash ${hash40}, got: ${result}`,
+      result.includes(`Stable-${hash40}`),
+      `Expected path to contain Stable-${hash40}, got: ${result}`,
     );
   });
 });

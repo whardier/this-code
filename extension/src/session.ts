@@ -165,14 +165,19 @@ export function collectSessionMetadata(
 
 export function getSessionJsonPath(metadata: SessionMetadata): string {
   if (metadata.remote_name && metadata.server_commit_hash) {
-    // D-05: SSH remote — collocated with VS Code Server binary
-    return path.join(
-      os.homedir(),
-      ".vscode-server",
-      "bin",
-      metadata.server_commit_hash,
-      "this-code-session.json",
-    );
+    // D-05: SSH remote — collocated with VS Code Server binary.
+    // remote_server_path handles both path structures:
+    //   legacy:  ~/.vscode-server/bin/{hash}
+    //   current: ~/.vscode-server/cli/servers/Stable-{hash}
+    const base =
+      metadata.remote_server_path ??
+      path.join(
+        os.homedir(),
+        ".vscode-server",
+        "bin",
+        metadata.server_commit_hash,
+      );
+    return path.join(base, "this-code-session.json");
   } else {
     // D-04: Local session — under ~/.this-code/sessions/
     return path.join(
