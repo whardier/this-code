@@ -50,7 +50,7 @@
 - [x] **CLI-02**: CLI is a single Rust binary using clap 4.6 + figment 0.10 + rusqlite 0.39 (bundled)
 - [ ] **CLI-03**: CLI intercepts `code` command when placed leftmost in PATH
 - [ ] **CLI-04**: CLI self-detects recursive invocation (environment variable guard + PATH stripping) before calling real `code`
-- [ ] **CLI-05**: CLI finds the real `code` binary by removing its own directory from PATH and using `which`/PATH resolution
+- [x] **CLI-05**: CLI finds the real `code` binary by removing its own directory from PATH and using `which`/PATH resolution
 - [ ] **CLI-06**: CLI installs into a dedicated directory (`~/.this-code/bin/`) to avoid PATH pollution
 
 ### Shell Integration
@@ -131,7 +131,7 @@
 | CLI-02      | Phase 2 | Complete |
 | CLI-03      | Phase 2 | Pending |
 | CLI-04      | Phase 2 | Pending |
-| CLI-05      | Phase 2 | Pending |
+| CLI-05      | Phase 2 | Complete |
 | CLI-06      | Phase 2 | Pending |
 | SHELL-01    | Phase 2 | Pending |
 | SHELL-02    | Phase 2 | Pending |

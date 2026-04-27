@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md — clap CLI structure and tracing init
-last_updated: "2026-04-27T19:59:39.751Z"
+stopped_at: Completed 02-03-PLAN.md — figment config infrastructure
+last_updated: "2026-04-27T20:08:31.225Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 15
-  completed_plans: 11
-  percent: 73
+  completed_plans: 12
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 02 (rust-cli-shell-integration) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-27
 
-Progress: [███████░░░] 73%
+Progress: [████████░░] 80%
 
 ## Phase 2 Wave Structure
 
@@ -70,6 +70,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P07 | 215 | 3 tasks | 3 files |
 | Phase 02-rust-cli-shell-integration P01 | 3min | - tasks | - files |
 | Phase 02-rust-cli-shell-integration P02 | 2min | 2 tasks | 2 files |
+| Phase 02-rust-cli-shell-integration P03 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -110,6 +111,10 @@ Recent decisions affecting current work:
 - [Phase ?]: pub(crate) on clap Cli/Commands — unreachable-pub lint fires on pub in single-binary crate
 - [Phase ?]: is_some_and() replaces .map().unwrap_or(false) — clippy::map_unwrap_or pedantic fires; is_some_and is idiomatic form
 - [Phase ?]: Shim detection before Cli::parse() — prevents code install routing to Install arm when invoked as code shim
+- [Phase 02-03]: pub(crate) on Config and load_config — unreachable_pub fires on pub in single-binary crate; matches 02-02 pattern
+- [Phase 02-03]: figment Env::prefixed without .split: CODE_PATH lowercases to code_path; split creates nested code.path
+- [Phase 02-03]: #[allow(dead_code)] on code_path field — consumed in Plans 02-04/02-05; allow removed when field is read
+- [Phase 02-03]: Shim detection preserved BEFORE Cli::parse() — plan code moved it after parse (breaks D-06 pass-through)
 
 ### Pending Todos
 
@@ -122,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T19:59:39.741Z
-Stopped at: Completed 02-02-PLAN.md — clap CLI structure and tracing init
+Last session: 2026-04-27T20:08:31.216Z
+Stopped at: Completed 02-03-PLAN.md — figment config infrastructure
 Resume file: None
