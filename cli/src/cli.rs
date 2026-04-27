@@ -1,0 +1,25 @@
+use clap::{Parser, Subcommand};
+
+/// VS Code session tracker and launch interceptor.
+#[derive(Parser)]
+#[command(
+    name = "this-code",
+    version,
+    about = "VS Code session tracker and launch interceptor"
+)]
+pub struct Cli {
+    /// Subcommand to run (omit to run as code shim).
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+}
+
+/// Available subcommands.
+#[derive(Subcommand)]
+pub enum Commands {
+    /// Install this-code shell integration (bash/zsh env file + code symlink).
+    Install {
+        /// Also write ~/.config/fish/conf.d/this-code.fish (idempotent).
+        #[arg(long)]
+        fish: bool,
+    },
+}
