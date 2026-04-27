@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md — CLI crate scaffold complete
-last_updated: "2026-04-27T19:54:07.628Z"
+stopped_at: Completed 02-02-PLAN.md — clap CLI structure and tracing init
+last_updated: "2026-04-27T19:59:39.751Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 15
-  completed_plans: 10
-  percent: 67
+  completed_plans: 11
+  percent: 73
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 02 (rust-cli-shell-integration) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-27
 
-Progress: [███████░░░] 67%
+Progress: [███████░░░] 73%
 
 ## Phase 2 Wave Structure
 
@@ -69,6 +69,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P06 | 97 | 1 tasks | 1 files |
 | Phase 01-extension-core-storage-foundation P07 | 215 | 3 tasks | 3 files |
 | Phase 02-rust-cli-shell-integration P01 | 3min | - tasks | - files |
+| Phase 02-rust-cli-shell-integration P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - [Phase ?]: which = "8" (not "7") — v8.0.2 is current release per research verification 2026-04-27
 - [Phase ?]: Cargo.lock committed for cli/ binary crate — T-02-01-01 supply chain threat mitigation
 - [Phase ?]: cli/clippy.toml sets msrv only; allow-list stays in Cargo.toml [lints.clippy] to avoid duplication
+- [Phase ?]: pub(crate) on clap Cli/Commands — unreachable-pub lint fires on pub in single-binary crate
+- [Phase ?]: is_some_and() replaces .map().unwrap_or(false) — clippy::map_unwrap_or pedantic fires; is_some_and is idiomatic form
+- [Phase ?]: Shim detection before Cli::parse() — prevents code install routing to Install arm when invoked as code shim
 
 ### Pending Todos
 
@@ -118,6 +122,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T19:54:07.619Z
-Stopped at: Completed 02-01-PLAN.md — CLI crate scaffold complete
+Last session: 2026-04-27T19:59:39.741Z
+Stopped at: Completed 02-02-PLAN.md — clap CLI structure and tracing init
 Resume file: None
