@@ -17,9 +17,10 @@ export interface SessionMetadata {
 // --- Private helpers ---
 
 function extractCommitHash(appRoot: string): string | null {
-  // SSH remote appRoot: /home/u/.vscode-server/bin/{40-hex}/resources/app
-  // Commit hash is the path segment immediately after 'bin'
   const parts = appRoot.split(path.sep);
+
+  // Strategy 1 (legacy): bin/{40-hex}/resources/app
+  // e.g. ~/.vscode-server/bin/abc123.../resources/app
   const binIdx = parts.lastIndexOf("bin");
   if (binIdx >= 0 && binIdx + 1 < parts.length) {
     const candidate = parts[binIdx + 1];
@@ -27,7 +28,19 @@ function extractCommitHash(appRoot: string): string | null {
       return candidate;
     }
   }
-  return null; // local VS Code — appRoot has no bin/{hash} segment
+
+  // Strategy 2 (current): cli/servers/Stable-{40-hex}/server
+  // e.g. ~/.vscode-server/cli/servers/Stable-abc123.../server
+  const serversIdx = parts.lastIndexOf("servers");
+  if (serversIdx >= 0 && serversIdx + 1 < parts.length) {
+    const stableSegment = parts[serversIdx + 1];
+    const match = stableSegment.match(/^Stable-([0-9a-f]{40})$/i);
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return null; // local VS Code — no remote server path segment
 }
 
 function extractServerBinPath(
@@ -38,10 +51,25 @@ function extractServerBinPath(
     return null;
   }
   const parts = appRoot.split(path.sep);
+
+  // Strategy 1 (legacy): bin/{40-hex} — return up to and including hash segment
   const binIdx = parts.lastIndexOf("bin");
-  if (binIdx >= 0) {
-    return parts.slice(0, binIdx + 2).join(path.sep); // up to and including the hash segment
+  if (binIdx >= 0 && binIdx + 1 < parts.length) {
+    const candidate = parts[binIdx + 1];
+    if (/^[0-9a-f]{40}$/i.test(candidate)) {
+      return parts.slice(0, binIdx + 2).join(path.sep);
+    }
   }
+
+  // Strategy 2 (current): cli/servers/Stable-{40-hex} — return up to and including Stable-{hash}
+  const serversIdx = parts.lastIndexOf("servers");
+  if (serversIdx >= 0 && serversIdx + 1 < parts.length) {
+    const stableSegment = parts[serversIdx + 1];
+    if (stableSegment.match(/^Stable-([0-9a-f]{40})$/i)) {
+      return parts.slice(0, serversIdx + 2).join(path.sep);
+    }
+  }
+
   return null;
 }
 

@@ -565,6 +565,32 @@ suite("SESSION-HELPERS: extractCommitHash via getSessionJsonPath", () => {
       `Expected filename deadbeef12345678.json, got: ${result}`,
     );
   });
+
+  test("cli/servers/Stable-{hash} path: getSessionJsonPath uses SSH path", () => {
+    const { getSessionJsonPath } = require("../session");
+    const hash40 = "10c8e557c8b9f9ed0a87f61f1c9a44bde731c409";
+    // Simulates the new VS Code Server path structure observed in UAT
+    const stablePath = `/Users/testuser/.vscode-server/cli/servers/Stable-${hash40}/server`;
+    const metadata = {
+      workspace_path: "/Users/testuser/myproject",
+      user_data_dir: "/Users/testuser/.vscode-server/data",
+      profile: null,
+      local_ide_path: stablePath,
+      remote_name: "ssh-remote",
+      remote_server_path: null,
+      server_commit_hash: hash40,  // as would be set by fixed extractCommitHash()
+      local_session_hash: "deadbeef12345678",
+    };
+    const result = getSessionJsonPath(metadata);
+    assert.ok(
+      result.includes(`.vscode-server`) && result.endsWith("this-code-session.json"),
+      `Expected SSH remote JSON path, got: ${result}`,
+    );
+    assert.ok(
+      result.includes(hash40),
+      `Expected path to contain commit hash ${hash40}, got: ${result}`,
+    );
+  });
 });
 
 // Suppress unused import warnings — these will be used in later plans
