@@ -1,0 +1,59 @@
+name: CLI CI
+
+on:
+  push:
+    paths:
+      - 'cli/**'
+      - '.github/workflows/cli-ci.yml'
+  pull_request:
+    paths:
+      - 'cli/**'
+      - '.github/workflows/cli-ci.yml'
+
+jobs:
+  build:
+    name: Rust CLI (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache Cargo registry and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            cli/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('cli/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        working-directory: cli
+        run: cargo fmt --check
+
+      - name: Clippy (deny warnings)
+        working-directory: cli
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Build (release)
+        working-directory: cli
+        run: cargo build --release
+
+      - name: Test
+        working-directory: cli
+        run: cargo test
