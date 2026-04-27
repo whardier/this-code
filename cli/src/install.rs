@@ -5,11 +5,11 @@ use std::path::Path;
 /// Content written to `~/.this-code/env`.
 ///
 /// POSIX sh script that prepends `~/.this-code/bin` to PATH using the case-colon guard.
-/// Users source this from `~/.bashrc` or `~/.zshrc` (NOT `~/.zshenv` — macOS path_helper
+/// Users source this from `~/.bashrc` or `~/.zshrc` (NOT `~/.zshenv` — macOS `path_helper`
 /// in /etc/zprofile runs after ~/.zshenv and would reorder PATH; sourcing from ~/.zshrc
 /// ensures this-code stays leftmost).
 ///
-/// Uses THIS_CODE_HOME (not WHICH_CODE_HOME — project renamed from which-code to this-code).
+/// Uses `THIS_CODE_HOME` (not `WHICH_CODE_HOME` — project renamed from which-code to this-code).
 const ENV_FILE_CONTENT: &str = "#!/bin/sh
 # this-code shell integration
 # Source this file from ~/.bashrc or ~/.zshrc:
@@ -91,8 +91,7 @@ fn create_code_symlink(bin_dir: &Path) -> Result<()> {
 /// When `fish` is true, also creates:
 /// - `~/.config/fish/conf.d/this-code.fish`
 pub(crate) fn run_install(fish: bool) -> Result<()> {
-    let base = BaseDirs::new()
-        .ok_or_else(|| anyhow::anyhow!("Cannot determine home directory"))?;
+    let base = BaseDirs::new().ok_or_else(|| anyhow::anyhow!("Cannot determine home directory"))?;
     let home = base.home_dir();
 
     // Create ~/.this-code/bin/ (and parent ~/.this-code/ if needed).

@@ -37,13 +37,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Install { fish }) => {
-            // Stub: real implementation in Plan 02-05
-            tracing::debug!(fish, "install subcommand invoked (stub)");
-            let _ = fish;
-            let _ = &config;
-            Ok(())
-        }
+        Some(Commands::Install { fish }) => install::run_install(fish),
         None => {
             // Invoked as "this-code" with no subcommand: print help and exit 0.
             use clap::CommandFactory as _;
