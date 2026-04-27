@@ -14,7 +14,7 @@ This Code ships in four phases following the data flow: extension writes session
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Extension Core + Storage Foundation** - VS Code extension records session metadata to per-instance JSON and SQLite index
-- [ ] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH
+- [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
 - [ ] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary
 - [ ] **Phase 4: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
 
@@ -65,7 +65,7 @@ Plans:
 - [x] 02-03-PLAN.md — Config infrastructure: figment Config struct, load_config(), THIS_CODE_CODE_PATH → code_path (CLI-05)
 - [x] 02-04-PLAN.md — Real code discovery + recursion guard + pass-through: run_shim(), discover_real_code(), exec (CLI-03, CLI-04, CLI-05, PLAT-02)
 - [x] 02-05-PLAN.md — this-code install command: env file, symlink, fish conf.d, idempotent (CLI-06, SHELL-02, SHELL-03, SHELL-04)
-- [ ] 02-06-PLAN.md — Rust CI: GitHub Actions matrix ubuntu-latest + macos-latest, fmt + clippy + build + test (PLAT-02)
+- [x] 02-06-PLAN.md — Rust CI: GitHub Actions matrix ubuntu-latest + macos-latest, fmt + clippy + build + test (PLAT-02)
 
 ### Phase 3: Session Querying + Pass-Through
 
@@ -100,6 +100,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase                                  | Plans Complete | Status      | Completed |
 | -------------------------------------- | -------------- | ----------- | --------- |
 | 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
-| 2. Rust CLI + Shell Integration        | 1/6 | In Progress|  |
+| 2. Rust CLI + Shell Integration        | 6/6 | Complete   | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 0/?            | Not started | -         |
 | 4. Packaging + Distribution            | 0/?            | Not started | -         |
