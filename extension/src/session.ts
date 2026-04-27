@@ -77,19 +77,26 @@ function extractProfileFromGlobalStorageUri(
 function extractUserDataDirFromGlobalStorageUri(
   globalStorageUri: vscode.Uri,
 ): string | null {
-  // Parent of 'User' segment is the user data dir
-  // macOS: ~/Library/Application Support/Code  (parent of User)
-  // Linux: ~/.config/Code
-  // SSH remote: ~/.vscode-server/data
+  // The globalStorage directory is always a child of the User data dir:
+  // macOS:  ~/Library/Application Support/Code/User/globalStorage/...
+  // Linux:  ~/.config/Code/User/globalStorage/...
+  // remote: ~/.vscode-server/data/Machine/globalStorage/... (no User segment)
+  //
+  // Strategy: anchor on 'globalStorage' segment, then find the last 'User'
+  // segment before it. Using lastIndexOf avoids matching the leading 'Users'
+  // segment present on macOS paths (/Users/username/...).
   try {
     const fsPath = globalStorageUri.fsPath;
     const parts = fsPath.split(path.sep);
-    const userIdx = parts.indexOf("User");
-    if (userIdx > 0) {
-      return parts.slice(0, userIdx).join(path.sep);
+    const globalStorageIdx = parts.indexOf("globalStorage");
+    if (globalStorageIdx > 1) {
+      const userIdx = parts.lastIndexOf("User", globalStorageIdx);
+      if (userIdx > 0) {
+        return parts.slice(0, userIdx).join(path.sep);
+      }
     }
   } catch {
-    // Parsing failed
+    // Parsing failed — globalStorageUri format unexpected
   }
   return null;
 }

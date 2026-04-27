@@ -478,7 +478,6 @@ suite("PLAT-01: macOS and Linux", () => {
       "..",
       "..",
       "..",
-      "..",
       ".github",
       "workflows",
       "ci.yml",
@@ -509,10 +508,12 @@ suite("PLAT-01: macOS and Linux", () => {
       "os.homedir() must return a non-empty path",
     );
     // macOS: /Users/... | Linux: /home/... or /root
-    assert.ok(
-      homeDir.startsWith("/"),
-      "home dir must be an absolute POSIX path on macOS/Linux",
-    );
+    if (process.platform !== "win32") {
+      assert.ok(
+        homeDir.startsWith("/"),
+        "home dir must be an absolute POSIX path on macOS/Linux",
+      );
+    }
   });
 });
 

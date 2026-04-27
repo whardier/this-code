@@ -76,14 +76,16 @@ export async function activate(
     const result = await db.run(
       `INSERT INTO invocations
        (workspace_path, user_data_dir, profile, local_ide_path,
-        remote_name, remote_server_path, open_files)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        remote_name, remote_server_path, server_commit_hash, server_bin_path, open_files)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         metadata.workspace_path,
         metadata.user_data_dir,
         metadata.profile,
         metadata.local_ide_path,
         metadata.remote_name,
+        metadata.remote_server_path,
+        metadata.server_commit_hash,
         metadata.remote_server_path,
         "[]",
       ],

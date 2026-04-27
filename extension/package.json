@@ -44,6 +44,7 @@
     "build:prod": "node esbuild.js --production",
     "watch": "node esbuild.js --watch",
     "typecheck": "tsc --noEmit",
+    "pretest": "tsc -p tsconfig.test.json",
     "test": "vscode-test",
     "package": "vsce package"
   },

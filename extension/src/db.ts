@@ -4,11 +4,8 @@ export class Database {
   private db: sqlite3.Database;
 
   constructor(dbPath: string) {
-    this.db = new sqlite3.Database(dbPath, (err) => {
-      if (err) {
-        throw err;
-      }
-    });
+    this.db = new sqlite3.Database(dbPath);
+    // open errors surface on the first .run()/.get() call via their own callbacks
   }
 
   run(sql: string, params: unknown[] = []): Promise<sqlite3.RunResult> {
