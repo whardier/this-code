@@ -1,0 +1,4 @@
+# Clippy configuration for this-code CLI
+# Pedantic lints enabled via Cargo.toml [lints.clippy]; overrides below.
+# Allow-list matches periphore/ conventions.
+msrv = "1.85.0"
