@@ -7,7 +7,7 @@ use clap::{Parser, Subcommand};
     version,
     about = "VS Code session tracker and launch interceptor"
 )]
-pub struct Cli {
+pub(crate) struct Cli {
     /// Subcommand to run (omit to run as code shim).
     #[command(subcommand)]
     pub command: Option<Commands>,
@@ -15,7 +15,7 @@ pub struct Cli {
 
 /// Available subcommands.
 #[derive(Subcommand)]
-pub enum Commands {
+pub(crate) enum Commands {
     /// Install this-code shell integration (bash/zsh env file + code symlink).
     Install {
         /// Also write ~/.config/fish/conf.d/this-code.fish (idempotent).

@@ -1,3 +1,49 @@
-fn main() {
-    println!("this-code");
+mod cli;
+
+use anyhow::Result;
+use clap::Parser as _;
+use cli::{Cli, Commands};
+
+fn main() -> Result<()> {
+    // Initialize tracing subscriber with env-filter support.
+    // Respects RUST_LOG env var (e.g., RUST_LOG=debug ./this-code install).
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_writer(std::io::stderr)
+        .init();
+
+    // Detect shim mode BEFORE Cli::parse().
+    // When invoked as "code", ALL argument patterns are pass-through (D-06).
+    // Checking before parse prevents `code install` from matching the Install arm
+    // instead of passing through to the real `code` binary.
+    // On Linux, current_exe() resolves symlinks via /proc/self/exe — use argv[0] instead.
+    let invoked_as_code = std::env::args().next().is_some_and(|a| {
+        std::path::Path::new(&a)
+            .file_name()
+            .is_some_and(|n| n == "code")
+    });
+
+    if invoked_as_code {
+        // Stub: real shim pass-through in Plan 02-04
+        tracing::debug!("shim mode: invoked as 'code' (stub)");
+        return Ok(());
+    }
+
+    let cli = Cli::parse();
+
+    match cli.command {
+        Some(Commands::Install { fish }) => {
+            // Stub: real implementation in Plan 02-05
+            tracing::debug!(fish, "install subcommand invoked (stub)");
+            let _ = fish;
+            Ok(())
+        }
+        None => {
+            // Invoked as "this-code" with no subcommand: print help and exit 0.
+            use clap::CommandFactory as _;
+            Cli::command().print_help()?;
+            println!();
+            Ok(())
+        }
+    }
 }
