@@ -48,17 +48,17 @@
 
 - [x] **CLI-01**: CLI command name is `this-code`; also installable as `code` shim via symlink or copy
 - [x] **CLI-02**: CLI is a single Rust binary using clap 4.6 + figment 0.10 + rusqlite 0.39 (bundled)
-- [ ] **CLI-03**: CLI intercepts `code` command when placed leftmost in PATH
-- [ ] **CLI-04**: CLI self-detects recursive invocation (environment variable guard + PATH stripping) before calling real `code`
+- [x] **CLI-03**: CLI intercepts `code` command when placed leftmost in PATH
+- [x] **CLI-04**: CLI self-detects recursive invocation (environment variable guard + PATH stripping) before calling real `code`
 - [x] **CLI-05**: CLI finds the real `code` binary by removing its own directory from PATH and using `which`/PATH resolution
-- [ ] **CLI-06**: CLI installs into a dedicated directory (`~/.this-code/bin/`) to avoid PATH pollution
+- [x] **CLI-06**: CLI installs into a dedicated directory (`~/.this-code/bin/`) to avoid PATH pollution
 
 ### Shell Integration
 
-- [ ] **SHELL-01**: CLI provides `this-code init bash`, `this-code init zsh`, and `this-code init fish` subcommands that print shell-specific integration scripts
-- [ ] **SHELL-02**: Shell integration adds `~/.this-code/bin/` to leftmost PATH position
-- [ ] **SHELL-03**: Shell integration for zsh sets PATH in `~/.zshrc` (not `~/.zshenv`) to run after macOS `path_helper`
-- [ ] **SHELL-04**: Shell integration for fish uses `fish_add_path` (not `eval`)
+- [x] **SHELL-01**: CLI provides `this-code init bash`, `this-code init zsh`, and `this-code init fish` subcommands that print shell-specific integration scripts
+- [x] **SHELL-02**: Shell integration adds `~/.this-code/bin/` to leftmost PATH position
+- [x] **SHELL-03**: Shell integration for zsh sets PATH in `~/.zshrc` (not `~/.zshenv`) to run after macOS `path_helper`
+- [x] **SHELL-04**: Shell integration for fish uses `fish_add_path` (not `eval`)
 
 ### Session Querying
 
@@ -78,7 +78,7 @@
 
 - [x] **PLAT-01
 **: macOS and Linux are primary supported platforms
-- [ ] **PLAT-02**: Windows support is best-effort (paths and shell integration may differ)
+- [x] **PLAT-02**: Windows support is best-effort (paths and shell integration may differ)
 
 ## v2 Requirements
 
@@ -129,14 +129,14 @@
 | TRACK-05    | Phase 1 | Pending |
 | CLI-01      | Phase 2 | Complete |
 | CLI-02      | Phase 2 | Complete |
-| CLI-03      | Phase 2 | Pending |
-| CLI-04      | Phase 2 | Pending |
+| CLI-03      | Phase 2 | Complete |
+| CLI-04      | Phase 2 | Complete |
 | CLI-05      | Phase 2 | Complete |
-| CLI-06      | Phase 2 | Pending |
-| SHELL-01    | Phase 2 | Pending |
-| SHELL-02    | Phase 2 | Pending |
-| SHELL-03    | Phase 2 | Pending |
-| SHELL-04    | Phase 2 | Pending |
+| CLI-06      | Phase 2 | Complete |
+| SHELL-01    | Phase 2 | Complete |
+| SHELL-02    | Phase 2 | Complete |
+| SHELL-03    | Phase 2 | Complete |
+| SHELL-04    | Phase 2 | Complete |
 | QUERY-01    | Phase 3 | Pending |
 | QUERY-02    | Phase 3 | Pending |
 | QUERY-03    | Phase 3 | Pending |
@@ -146,7 +146,7 @@
 | PKG-03      | Phase 4 | Pending |
 | PKG-04      | Phase 4 | Pending |
 | PLAT-01     | Phase 1 | Pending |
-| PLAT-02     | Phase 2 | Pending |
+| PLAT-02     | Phase 2 | Complete |
 
 **Coverage:**
 

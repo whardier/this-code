@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md — figment config infrastructure
-last_updated: "2026-04-27T20:13:56.403Z"
+stopped_at: Completed 02-05-PLAN.md — install command
+last_updated: "2026-04-27T20:20:48.087Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 15
-  completed_plans: 13
-  percent: 87
+  completed_plans: 14
+  percent: 93
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 ## Current Position
 
 Phase: 02 (rust-cli-shell-integration) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-04-27
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 93%
 
 ## Phase 2 Wave Structure
 
@@ -72,6 +72,7 @@ _Updated after each plan completion_
 | Phase 02-rust-cli-shell-integration P02 | 2min | 2 tasks | 2 files |
 | Phase 02-rust-cli-shell-integration P03 | 3min | 2 tasks | 2 files |
 | Phase 02-rust-cli-shell-integration P04 | 2min | 2 tasks | 2 files |
+| Phase 02-rust-cli-shell-integration P05 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -119,6 +120,11 @@ Recent decisions affecting current work:
 - [Phase ?]: 02-04 shim.rs pub(crate) pattern
 - [Phase ?]: 02-04: is_ok_and() on Result boolean tests
 - [Phase ?]: 02-04: shim sets THIS_CODE_ACTIVE on child env only
+- [Phase 02-05]: pub(crate) on run_install — unreachable_pub lint (same fix pattern as 02-02/03/04)
+- [Phase 02-05]: THIS_CODE_HOME env var name (not WHICH_CODE_HOME — project renamed from which-code to this-code)
+- [Phase 02-05]: Install instructions reference ~/.zshrc not ~/.zshenv — SHELL-03; macOS path_helper runs after ~/.zshenv and reorders PATH
+- [Phase 02-05]: Relative symlink target "this-code" — both code and this-code live in same bin dir; robust to home dir moves
+- [Phase 02-05]: symlink_metadata().is_ok() for idempotency — exists() returns false for broken symlinks; symlink_metadata() returns Ok for both live and broken
 
 ### Pending Todos
 
@@ -131,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T20:13:56.394Z
-Stopped at: Completed 02-03-PLAN.md — figment config infrastructure
+Last session: 2026-04-27T20:20:48.076Z
+Stopped at: Completed 02-05-PLAN.md — install command
 Resume file: None

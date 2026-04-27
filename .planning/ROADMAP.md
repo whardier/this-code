@@ -64,7 +64,7 @@ Plans:
 - [x] 02-02-PLAN.md — Clap argument structure + tracing: Cli struct, Commands enum, tracing subscriber init (CLI-01)
 - [x] 02-03-PLAN.md — Config infrastructure: figment Config struct, load_config(), THIS_CODE_CODE_PATH → code_path (CLI-05)
 - [x] 02-04-PLAN.md — Real code discovery + recursion guard + pass-through: run_shim(), discover_real_code(), exec (CLI-03, CLI-04, CLI-05, PLAT-02)
-- [ ] 02-05-PLAN.md — this-code install command: env file, symlink, fish conf.d, idempotent (CLI-06, SHELL-02, SHELL-03, SHELL-04)
+- [x] 02-05-PLAN.md — this-code install command: env file, symlink, fish conf.d, idempotent (CLI-06, SHELL-02, SHELL-03, SHELL-04)
 - [ ] 02-06-PLAN.md — Rust CI: GitHub Actions matrix ubuntu-latest + macos-latest, fmt + clippy + build + test (PLAT-02)
 
 ### Phase 3: Session Querying + Pass-Through
