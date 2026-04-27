@@ -1,8 +1,8 @@
 use anyhow::Result;
 use directories::BaseDirs;
 use figment::{
-    providers::{Env, Format, Toml},
     Figment,
+    providers::{Env, Format, Toml},
 };
 use serde::Deserialize;
 use std::path::PathBuf;

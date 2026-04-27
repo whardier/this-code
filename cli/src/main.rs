@@ -1,8 +1,10 @@
 mod cli;
+mod config;
 
 use anyhow::Result;
 use clap::Parser as _;
 use cli::{Cli, Commands};
+use config::load_config;
 
 fn main() -> Result<()> {
     // Initialize tracing subscriber with env-filter support.
@@ -11,6 +13,9 @@ fn main() -> Result<()> {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_writer(std::io::stderr)
         .init();
+
+    let config = load_config()?;
+    tracing::debug!(?config, "config loaded");
 
     // Detect shim mode BEFORE Cli::parse().
     // When invoked as "code", ALL argument patterns are pass-through (D-06).
@@ -26,6 +31,7 @@ fn main() -> Result<()> {
     if invoked_as_code {
         // Stub: real shim pass-through in Plan 02-04
         tracing::debug!("shim mode: invoked as 'code' (stub)");
+        let _ = &config;
         return Ok(());
     }
 
@@ -36,6 +42,7 @@ fn main() -> Result<()> {
             // Stub: real implementation in Plan 02-05
             tracing::debug!(fish, "install subcommand invoked (stub)");
             let _ = fish;
+            let _ = &config;
             Ok(())
         }
         None => {
