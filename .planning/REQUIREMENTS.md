@@ -47,7 +47,7 @@
 ### CLI Binary
 
 - [ ] **CLI-01**: CLI command name is `this-code`; also installable as `code` shim via symlink or copy
-- [ ] **CLI-02**: CLI is a single Rust binary using clap 4.6 + figment 0.10 + rusqlite 0.39 (bundled)
+- [x] **CLI-02**: CLI is a single Rust binary using clap 4.6 + figment 0.10 + rusqlite 0.39 (bundled)
 - [ ] **CLI-03**: CLI intercepts `code` command when placed leftmost in PATH
 - [ ] **CLI-04**: CLI self-detects recursive invocation (environment variable guard + PATH stripping) before calling real `code`
 - [ ] **CLI-05**: CLI finds the real `code` binary by removing its own directory from PATH and using `which`/PATH resolution
@@ -128,7 +128,7 @@
 | TRACK-04    | Phase 1 | Pending |
 | TRACK-05    | Phase 1 | Pending |
 | CLI-01      | Phase 2 | Pending |
-| CLI-02      | Phase 2 | Pending |
+| CLI-02      | Phase 2 | Complete |
 | CLI-03      | Phase 2 | Pending |
 | CLI-04      | Phase 2 | Pending |
 | CLI-05      | Phase 2 | Pending |

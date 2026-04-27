@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 2 context gathered — CLI install pattern, code discovery, config scaffolding decisions captured
-last_updated: "2026-04-27T00:00:00.000Z"
-last_activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
+status: executing
+stopped_at: Completed 02-01-PLAN.md — CLI crate scaffold complete
+last_updated: "2026-04-27T19:54:07.628Z"
+last_activity: 2026-04-27
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 15
+  completed_plans: 10
+  percent: 67
 ---
 
 # Project State
@@ -21,22 +21,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Developers using VS Code remote development with multiple profiles never have to think about which instance or --user-data-dir to use -- this-code remembers and routes automatically.
-**Current focus:** Phase 1: Extension Core + Storage Foundation
+**Current focus:** Phase 02 — rust-cli-shell-integration
 
 ## Current Position
 
-Phase: 1 of 4 (Extension Core + Storage Foundation)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-04-24 -- Roadmap created with 4 phases covering 35 requirements
+Phase: 02 (rust-cli-shell-integration) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-04-27
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 67%
+
+## Phase 2 Wave Structure
+
+| Wave | Plans | Autonomous | Depends On |
+| ---- | ----- | ---------- | ---------- |
+| 1 | 02-01 (scaffold crate) | yes | — |
+| 2 | 02-02 (clap + tracing), 02-03 (figment config) | yes | 02-01 |
+| 3 | 02-04 (shim + exec), 02-05 (install command) | yes | 02-02, 02-03 |
+| 4 | 02-06 (Rust CI) | no (checkpoint) | 02-05 |
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 7 (all Phase 1)
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -59,6 +68,7 @@ _Updated after each plan completion_
 | Phase 01-extension-core-storage-foundation P05 | 119 | 2 tasks | 2 files |
 | Phase 01-extension-core-storage-foundation P06 | 97 | 1 tasks | 1 files |
 | Phase 01-extension-core-storage-foundation P07 | 215 | 3 tasks | 3 files |
+| Phase 02-rust-cli-shell-integration P01 | 3min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -86,6 +96,16 @@ Recent decisions affecting current work:
 - GitHub Actions CI matrix on macos-latest and ubuntu-latest with fail-fast: false — both platforms verified independently on every push
 - TRACK-05 grep uses --exclude-dir=test to avoid false positive from test assertion string literal
 - Full npm test (VS Code integration tests) deferred to Phase 4 — Xvfb on Linux required; Phase 1 CI validates typecheck + build + static checks
+- Phase 2: `this-code install` (not `this-code init <shell>`) — D-03 supersedes SHELL-01
+- Phase 2: `which = "8"` in Cargo.toml (not "7") — v8.0.2 is current release (verified 2026-04-27)
+- Phase 2: figment Env::prefixed("THIS_CODE_") without .split("_") — adding split maps CODE_PATH to nested code.path, silently breaking override
+- Phase 2: argv[0] for shim detection (not current_exe()) — Linux resolves symlinks via /proc/self/exe
+- Phase 2: THIS_CODE_HOME env var name (not WHICH_CODE_HOME — project renamed)
+- Phase 2: rusqlite in Cargo.toml but unused in Phase 2 — DB interaction starts Phase 3
+- Phase 2: directories = "6" crate for BaseDirs::new() — safer than raw $HOME env var
+- [Phase ?]: which = "8" (not "7") — v8.0.2 is current release per research verification 2026-04-27
+- [Phase ?]: Cargo.lock committed for cli/ binary crate — T-02-01-01 supply chain threat mitigation
+- [Phase ?]: cli/clippy.toml sets msrv only; allow-list stays in Cargo.toml [lints.clippy] to avoid duplication
 
 ### Pending Todos
 
@@ -98,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T00:00:00.000Z
-Stopped at: Phase 2 context gathered — CLI install pattern, code discovery, config scaffolding decisions captured
-Resume file: .planning/phases/02-rust-cli-shell-integration/02-CONTEXT.md
+Last session: 2026-04-27T19:54:07.619Z
+Stopped at: Completed 02-01-PLAN.md — CLI crate scaffold complete
+Resume file: None

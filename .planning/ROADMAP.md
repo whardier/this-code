@@ -52,11 +52,20 @@ Plans:
 **Success Criteria** (what must be TRUE):
 
 1. Running `this-code` from a terminal prints help/version output confirming the Rust binary is functional
-2. After running `eval "$(this-code init zsh)"` (or bash/fish equivalent), `This Code` resolves to `~/.this-code/bin/code` (or the this-code shim)
+2. After running `this-code install` and sourcing `~/.this-code/env`, `code` resolves to `~/.this-code/bin/code` (the shim symlink)
 3. Running the `code` shim invokes the real VS Code `code` binary without infinite recursion, even when called repeatedly
-4. Running the `code` shim with `THIS_CODE_ACTIVE=1` already set (or equivalent guard) correctly passes through without double-processing
-5. On macOS with zsh, the shim remains leftmost in PATH even after opening a new terminal (survives `path_helper`)
-   **Plans**: TBD
+4. Running the `code` shim with `THIS_CODE_ACTIVE=1` already set correctly passes through without double-processing (D-05 guard)
+5. On macOS with zsh, the shim remains leftmost in PATH even after opening a new terminal (survives `path_helper` — env file sourced from `~/.zshrc`)
+   **Plans**: 6 plans
+
+Plans:
+
+- [x] 02-01-PLAN.md — Scaffold CLI crate: cli/Cargo.toml, cli/clippy.toml, cli/src/main.rs skeleton (CLI-02)
+- [ ] 02-02-PLAN.md — Clap argument structure + tracing: Cli struct, Commands enum, tracing subscriber init (CLI-01)
+- [ ] 02-03-PLAN.md — Config infrastructure: figment Config struct, load_config(), THIS_CODE_CODE_PATH → code_path (CLI-05)
+- [ ] 02-04-PLAN.md — Real code discovery + recursion guard + pass-through: run_shim(), discover_real_code(), exec (CLI-03, CLI-04, CLI-05, PLAT-02)
+- [ ] 02-05-PLAN.md — this-code install command: env file, symlink, fish conf.d, idempotent (CLI-06, SHELL-02, SHELL-03, SHELL-04)
+- [ ] 02-06-PLAN.md — Rust CI: GitHub Actions matrix ubuntu-latest + macos-latest, fmt + clippy + build + test (PLAT-02)
 
 ### Phase 3: Session Querying + Pass-Through
 
@@ -91,6 +100,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase                                  | Plans Complete | Status      | Completed |
 | -------------------------------------- | -------------- | ----------- | --------- |
 | 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
-| 2. Rust CLI + Shell Integration        | 0/?            | Not started | -         |
+| 2. Rust CLI + Shell Integration        | 1/6 | In Progress|  |
 | 3. Session Querying + Pass-Through     | 0/?            | Not started | -         |
 | 4. Packaging + Distribution            | 0/?            | Not started | -         |
