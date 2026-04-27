@@ -11,7 +11,7 @@ source:
   - 01-07-SUMMARY.md
   - 01-08-SUMMARY.md
 started: 2026-04-26T23:15:00Z
-updated: 2026-04-26T23:15:00Z
+updated: 2026-04-27T16:50:00Z
 ---
 
 ## Current Test
@@ -51,19 +51,10 @@ expected: |
                    on Linux → ~/.config/Code
     open_files: [] (empty array at activation)
     server_commit_hash: null for local, 40-char hex for SSH remote
-result: issue
+result: pass
 reported: |
-  {"schema_version":1,"recorded_at":"2026-04-27T08:08:48.631Z","workspace_path":"/Users/spencersr/src/github/whardier/int2x-frontend","user_data_dir":"/Users/spencersr/.vscode-server/data","profile":null,"local_ide_path":"/Users/spencersr/.vscode-server/cli/servers/Stable-10c8e557c8b9f9ed0a87f61f1c9a44bde731c409/server","remote_name":"ssh-remote","remote_server_path":null,"server_commit_hash":null,"open_files":[]}
-severity: major
-diagnosis: |
-  SSH remote session but server_commit_hash is null and remote_server_path is null.
-  Root cause: extractCommitHash() in session.ts searches for a path segment immediately
-  after a "bin" segment matching /^[0-9a-f]{40}$/i. The new VS Code remote server path
-  structure is cli/servers/Stable-{hash}/server — no "bin" segment, and the hash is
-  prefixed with "Stable-" so the regex fails. extractServerBinPath() returns null because
-  commitHash is null. getSessionJsonPath() falls back to local path (~/.this-code/sessions/)
-  instead of the SSH path (~/.vscode-server/bin/{hash}/this-code-session.json).
-  The hash IS present in local_ide_path — it just needs a second extraction pattern.
+  {"schema_version":1,"recorded_at":"2026-04-27T16:48:08.318Z","workspace_path":"/Users/spencersr/src/github/whardier/which-code","user_data_dir":"/Users/spencersr/.vscode-server/data","profile":null,"local_ide_path":"/Users/spencersr/.vscode-server/cli/servers/Stable-10c8e557c8b9f9ed0a87f61f1c9a44bde731c409/server","remote_name":"ssh-remote","remote_server_path":"/Users/spencersr/.vscode-server/cli/servers/Stable-10c8e557c8b9f9ed0a87f61f1c9a44bde731c409","server_commit_hash":"10c8e557c8b9f9ed0a87f61f1c9a44bde731c409","open_files":[]}
+notes: "Fixed by plans 01-09 (dual-pattern extractCommitHash) + getSessionJsonPath using remote_server_path. File written to ~/.vscode-server/cli/servers/Stable-{hash}/this-code-session.json"
 
 ### 3. sessions.db Row Queryable via sqlite3 CLI
 
@@ -126,9 +117,9 @@ expected: |
     sqlite3 ~/.this-code/sessions.db \
       "SELECT remote_name, server_commit_hash FROM invocations WHERE remote_name='ssh-remote' LIMIT 1;"
   Should return: ssh-remote|{40-char-hash}
-result: issue
-reported: "Already tested via Test 2 — extension IS running on SSH remote (remote_name=ssh-remote confirmed). However server_commit_hash=null and remote_server_path=null due to cli/servers/Stable-{hash} path format not handled. JSON written to local path instead of ~/.vscode-server/... Path. See Test 2 gap."
-severity: major
+result: pass
+reported: "Confirmed via Test 2 result — session JSON at ~/.vscode-server/cli/servers/Stable-10c8e557c8b9f9ed0a87f61f1c9a44bde731c409/this-code-session.json with remote_name=ssh-remote and server_commit_hash=10c8e557c8b9f9ed0a87f61f1c9a44bde731c409."
+notes: "Fixed by plans 01-09 + getSessionJsonPath patch"
 
 ### 7. Extension Disabled State
 
@@ -161,24 +152,11 @@ notes: "tsc --noEmit: OK, npm run build: OK (dist/extension.js 13941 bytes), tsc
 ## Summary
 
 total: 8
-passed: 6
-issues: 2
+passed: 8
+issues: 0
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "SSH remote session JSON contains server_commit_hash (40-char hex) and remote_server_path"
-  status: failed
-  reason: "User reported: SSH remote session shows server_commit_hash:null and remote_server_path:null. local_ide_path is cli/servers/Stable-{hash}/server — new VS Code remote path structure not handled by extractCommitHash()"
-  severity: major
-  test: 2
-  artifacts:
-    - path: "extension/src/session.ts"
-      issue: "extractCommitHash() only handles bin/{hash} path pattern; cli/servers/Stable-{hash}/server is the new VS Code Server path structure and is not matched"
-    - path: "extension/src/session.ts"
-      issue: "extractServerBinPath() returns null because commitHash is null; server binary directory path is lost"
-  missing:
-    - "Add cli/servers/Stable-{hash} extraction pattern to extractCommitHash() — strip 'Stable-' prefix and validate 40-char hex"
-    - "Add corresponding path construction to extractServerBinPath() for the cli/servers path structure"
-    - "getSessionJsonPath() falls back to local path when server_commit_hash is null — SSH sessions written to wrong location"
+(none — all gaps resolved by plans 01-08 and 01-09)
