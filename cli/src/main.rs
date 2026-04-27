@@ -1,5 +1,6 @@
 mod cli;
 mod config;
+mod shim;
 
 use anyhow::Result;
 use clap::Parser as _;
@@ -29,10 +30,7 @@ fn main() -> Result<()> {
     });
 
     if invoked_as_code {
-        // Stub: real shim pass-through in Plan 02-04
-        tracing::debug!("shim mode: invoked as 'code' (stub)");
-        let _ = &config;
-        return Ok(());
+        return shim::run_shim(&config);
     }
 
     let cli = Cli::parse();

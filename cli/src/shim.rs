@@ -11,9 +11,7 @@ use std::{
 /// Returns `true` if `THIS_CODE_ACTIVE=1` is set in the current environment.
 /// This is the D-05 recursion guard fast path.
 pub(crate) fn is_recursion_guard_active() -> bool {
-    std::env::var("THIS_CODE_ACTIVE")
-        .map(|v| v == "1")
-        .unwrap_or(false)
+    std::env::var("THIS_CODE_ACTIVE").is_ok_and(|v| v == "1")
 }
 
 /// Remove `~/.this-code/bin` from a colon-separated PATH string.
@@ -164,9 +162,7 @@ mod tests {
         // by checking the logic when env var is missing (best effort — relies on test env).
         // If THIS_CODE_ACTIVE=1 is set in test runner, this will report false positive.
         // Real behavior verified by the integration verify step.
-        let guard = std::env::var("THIS_CODE_ACTIVE")
-            .map(|v| v == "1")
-            .unwrap_or(false);
+        let guard = std::env::var("THIS_CODE_ACTIVE").is_ok_and(|v| v == "1");
         // We just verify the function signature compiles and returns bool.
         let _ = guard;
     }
