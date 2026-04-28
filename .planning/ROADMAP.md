@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Extension Core + Storage Foundation** - VS Code extension records session metadata to per-instance JSON and SQLite index
 - [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
-- [ ] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary
+- [x] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary (completed 2026-04-28)
 - [ ] **Phase 4: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
 
 ## Phase Details
@@ -83,7 +83,7 @@ Plans:
 Plans:
 
 - [x] 03-01-PLAN.md — Data layer: db.rs (Session struct, open_db, query_latest_session) + config.rs db_path field (QUERY-01)
-- [ ] 03-02-PLAN.md — Query command: query.rs handler, cli.rs Query variant, main.rs wiring (QUERY-02, QUERY-03, QUERY-04)
+- [x] 03-02-PLAN.md — Query command: query.rs handler, cli.rs Query variant, main.rs wiring (QUERY-02, QUERY-03, QUERY-04)
 
 ### Phase 4: Packaging + Distribution
 
@@ -106,5 +106,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | -------------------------------------- | -------------- | ----------- | --------- |
 | 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
 | 2. Rust CLI + Shell Integration        | 6/6 | Complete   | 2026-04-27 |
-| 3. Session Querying + Pass-Through     | 1/2 | In Progress|  |
+| 3. Session Querying + Pass-Through     | 2/2 | Complete   | 2026-04-28 |
 | 4. Packaging + Distribution            | 0/?            | Not started | -         |
