@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Code ships in four phases following the data flow: extension writes session state (Phase 1), CLI reads it (Phase 2), querying exposes it (Phase 3), packaging distributes it (Phase 4). The extension must come first because it creates the SQLite schema and populates the database that everything downstream depends on. Each phase delivers a complete, independently verifiable capability.
+This Code ships in five phases following the data flow: extension writes session state (Phase 1), CLI reads it (Phase 2), querying exposes it (Phase 3), a `which` subcommand exposes binary routing (Phase 4), packaging distributes it (Phase 5). The extension must come first because it creates the SQLite schema and populates the database that everything downstream depends on. Each phase delivers a complete, independently verifiable capability.
 
 ## Phases
 
@@ -13,10 +13,11 @@ This Code ships in four phases following the data flow: extension writes session
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Extension Core + Storage Foundation** - VS Code extension records session metadata to per-instance JSON and SQLite index
+- [x] **Phase 1: Extension Core + Storage Foundation** - VS Code extension records session metadata to per-instance JSON and SQLite index (completed 2026-04-27)
 - [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
 - [x] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary (completed 2026-04-28)
-- [ ] **Phase 4: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
+- [ ] **Phase 4: this-code which subcommand** - `this-code which [PATH]` prints the real `code` binary path and matched workspace for a given path
+- [ ] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
 
 ## Phase Details
 
@@ -85,10 +86,22 @@ Plans:
 - [x] 03-01-PLAN.md — Data layer: db.rs (Session struct, open_db, query_latest_session) + config.rs db_path field (QUERY-01)
 - [x] 03-02-PLAN.md — Query command: query.rs handler, cli.rs Query variant, main.rs wiring (QUERY-02, QUERY-03, QUERY-04)
 
-### Phase 4: Packaging + Distribution
+### Phase 4: this-code which subcommand
+
+**Goal**: `this-code which [PATH]` prints the real `code` binary path (and matched workspace) for a given path, without displaying session data
+**Depends on**: Phase 3
+**Requirements**: TBD
+**Success Criteria** (what must be TRUE):
+
+1. Running `this-code which /path/to/project` prints the real `code` binary path that would be used for that directory
+2. Running `this-code which /path/to/project` also shows the matched workspace from the session store when a session exists
+3. `which` is clearly distinct from `query --dry-run` — it answers "what binary would launch?" not "what session exists?"
+   **Plans**: TBD
+
+### Phase 5: Packaging + Distribution
 
 **Goal**: Users can install This Code from the VS Code Marketplace or GitHub Releases on any supported platform
-**Depends on**: Phase 3
+**Depends on**: Phase 4
 **Requirements**: PKG-01, PKG-02, PKG-03, PKG-04
 **Success Criteria** (what must be TRUE):
 
@@ -100,22 +113,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
-| Phase                                  | Plans Complete | Status      | Completed |
-| -------------------------------------- | -------------- | ----------- | --------- |
-| 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
-| 2. Rust CLI + Shell Integration        | 6/6 | Complete   | 2026-04-27 |
-| 3. Session Querying + Pass-Through     | 2/2 | Complete    | 2026-04-28 |
-| 4. Packaging + Distribution            | 0/?            | Not started | -         |
-
-## Backlog
-
-### Phase 999.1: this-code which subcommand (BACKLOG)
-
-**Goal:** Add a `this-code which [PATH]` subcommand that prints the real `code` binary path (and matched workspace) for a given path, without displaying session data. Cleaner separation of concerns from `--dry-run` on `query` — `which` answers "what binary would launch?" while `query` answers "what session exists?".
-**Requirements:** TBD
-**Plans:** 2/2 plans complete
-
-Plans:
-- [ ] TBD (promote with /gsd-review-backlog when ready)
+| Phase                                  | Plans Complete | Status      | Completed  |
+| -------------------------------------- | -------------- | ----------- | ---------- |
+| 1. Extension Core + Storage Foundation | 9/9            | Complete    | 2026-04-27 |
+| 2. Rust CLI + Shell Integration        | 6/6            | Complete    | 2026-04-27 |
+| 3. Session Querying + Pass-Through     | 2/2            | Complete    | 2026-04-28 |
+| 4. this-code which subcommand          | 0/?            | Not started | -          |
+| 5. Packaging + Distribution            | 0/?            | Not started | -          |
