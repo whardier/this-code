@@ -2,7 +2,7 @@
 
 ## What This Is
 
-This Code is a VS Code launch interceptor and session tracker. A lightweight VS Code extension (`whardier.this-code`) runs wherever VS Code is running (local or SSH remote) and records session state — workspace path, `--user-data-dir`, `--profile`, server commit hash, and open file manifest — into per-instance JSON files alongside each VS Code Server binary and into a SQLite index at `~/.which-code/sessions.db`. A companion CLI tool (`this-code`, written in Rust) sits leftmost in the user's PATH as `code`, captures launch context, avoids recursive self-invocation, and reads the session store to route subsequent `code` calls to the right VS Code instance and profile.
+This Code is a VS Code launch interceptor and session tracker. A lightweight VS Code extension (`whardier.this-code`) runs wherever VS Code is running (local or SSH remote) and records session state — workspace path, `--user-data-dir`, `--profile`, server commit hash, and open file manifest — into per-instance JSON files alongside each VS Code Server binary and into a SQLite index at `~/.this-code/sessions.db`. A companion CLI tool (`this-code`, written in Rust) sits leftmost in the user's PATH as `code`, captures launch context, avoids recursive self-invocation, and reads the session store to route subsequent `code` calls to the right VS Code instance and profile.
 
 ## Core Value
 
@@ -12,15 +12,18 @@ Developers using VS Code remote development (SSH, Dev Containers) with multiple 
 
 ### Validated
 
-(None yet — ship to validate)
+- CLI-01 through CLI-06: `this-code` binary installs, provides `--help`/`--version`, installs shell integration, passes through via shim with recursion guard — validated Phase 2
+- SHELL-01 through SHELL-04: `this-code install [--fish]` creates env file (POSIX sh case-colon guard), code symlink, and fish conf.d file; instructions reference `~/.zshrc` — validated Phase 2
+- PLAT-02: macOS and Linux CI matrix with `fail-fast: false` — validated Phase 2
 
 ### Active
 
 See `.planning/REQUIREMENTS.md` for the full v1 requirement list (35 requirements across EXT, STOR, TRACK, CLI, SHELL, QUERY, PKG, PLAT categories).
 
 Key active requirements:
-- [ ] Extension (`whardier.this-code`) writes per-instance session state to `~/.vscode-server/bin/{hash}/which-code-session.json`
-- [ ] Extension maintains SQLite index at `~/.which-code/sessions.db` (WAL mode)
+
+- [ ] Extension (`whardier.this-code`) writes per-instance session state to `~/.vscode-server/bin/{hash}/this-code-session.json`
+- [ ] Extension maintains SQLite index at `~/.this-code/sessions.db` (WAL mode)
 - [ ] Extension runs with `extensionKind: ["workspace"]` — tracks files on the machine they live on
 - [ ] Extension tracks file open/close events, workspace root, server commit hash, --user-data-dir, --profile
 - [ ] Extension has no UI — config-only with Output Channel
@@ -39,15 +42,15 @@ Key active requirements:
 
 ## Context
 
-- Project renamed from "Which Code" / `which-code` to "This Code" / `this-code` during initialization
+- Project renamed from "This Code" / `this-code` to "This Code" / `this-code` during initialization
 - Extension ID: `whardier.this-code`; marketplace name: "This Code"
 - Per-instance text files live in `~/.vscode-server/bin/{hash}/` — collocated with server binary, zero locking concerns
-- SQLite index at `~/.which-code/sessions.db` aggregates across all instances for CLI querying
-- `extensionKind: ["workspace"]` means extension runs on remote host during SSH sessions — this is intentional, so it tracks remote files and writes to the remote machine's `~/.which-code/`
-- The `this-code` CLI installed on a machine reads that machine's `~/.which-code/sessions.db`
+- SQLite index at `~/.this-code/sessions.db` aggregates across all instances for CLI querying
+- `extensionKind: ["workspace"]` means extension runs on remote host during SSH sessions — this is intentional, so it tracks remote files and writes to the remote machine's `~/.this-code/`
+- The `this-code` CLI installed on a machine reads that machine's `~/.this-code/sessions.db`
 - The periphore project (`../periphore/`) is the Rust reference: clap v4, figment, rusqlite, conventional commits, prek hooks
 - The Rust CLI is a single binary crate (not a workspace) — follows periphore tooling conventions
-- `this-code` CLI installs into `~/.which-code/bin/` to avoid PATH pollution from other binaries
+- `this-code` CLI installs into `~/.this-code/bin/` to avoid PATH pollution from other binaries
 - Shell integration uses `this-code init <shell>` subcommand pattern (not raw sourcing)
 - SQLite library for extension: `@vscode/sqlite3` (Node-API prebuilts, ABI-stable across Electron) — NOT `better-sqlite3`
 - `globalStorageUri` NOT used for primary storage — resolves to different paths per profile/remote/platform
@@ -65,21 +68,22 @@ Key active requirements:
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Fixed path ~/.which-code/sessions.db (not globalStorageUri) | globalStorageUri resolves to remote host filesystem; fixed path works consistently on every machine | — Pending |
-| extensionKind: ["workspace"] | Extension should run where files are (local or remote) and write state to that machine | — Pending |
-| Per-instance JSON files as primary storage | Collocated with VS Code Server binary; zero locking; easy to glob; survives SQLite failures | — Pending |
-| Open/close events only (not saves) | Reduces noise; workspace + opened files captures enough context for routing | — Pending |
-| Single Rust crate (not workspace) | CLI stays small; workspace overhead not justified at v1 | — Pending |
-| Dedicated install directory ~/.which-code/bin/ | Prevents accidental PATH pollution from other binaries | — Pending |
-| @vscode/sqlite3 over better-sqlite3 | better-sqlite3 has NODE_MODULE_VERSION mismatches with Electron; @vscode/sqlite3 is Microsoft's own fork with Node-API prebuilts | — Pending |
+| Decision                                                   | Rationale                                                                                                                        | Outcome   |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Fixed path ~/.this-code/sessions.db (not globalStorageUri) | globalStorageUri resolves to remote host filesystem; fixed path works consistently on every machine                              | — Pending |
+| extensionKind: ["workspace"]                               | Extension should run where files are (local or remote) and write state to that machine                                           | — Pending |
+| Per-instance JSON files as primary storage                 | Collocated with VS Code Server binary; zero locking; easy to glob; survives SQLite failures                                      | — Pending |
+| Open/close events only (not saves)                         | Reduces noise; workspace + opened files captures enough context for routing                                                      | — Pending |
+| Single Rust crate (not workspace)                          | CLI stays small; workspace overhead not justified at v1                                                                          | — Pending |
+| Dedicated install directory ~/.this-code/bin/              | Prevents accidental PATH pollution from other binaries                                                                           | — Pending |
+| @vscode/sqlite3 over better-sqlite3                        | better-sqlite3 has NODE_MODULE_VERSION mismatches with Electron; @vscode/sqlite3 is Microsoft's own fork with Node-API prebuilts | — Pending |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
+
 1. Requirements invalidated? → Move to Out of Scope with reason
 2. Requirements validated? → Move to Validated with phase reference
 3. New requirements emerged? → Add to Active
@@ -87,10 +91,12 @@ This document evolves at phase transitions and milestone boundaries.
 5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
+
 1. Full review of all sections
 2. Core Value check — still the right priority?
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-25 after initialization and research*
+
+_Last updated: 2026-04-27 after Phase 2 completion — Rust CLI scaffold + shell integration delivered_
