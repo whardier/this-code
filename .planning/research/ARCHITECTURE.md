@@ -5,7 +5,7 @@
 
 ## Recommended Architecture
 
-Which Code is a two-process system with a shared SQLite database. The VS Code extension (TypeScript) is the **writer** -- it records session data. The Rust CLI is the **reader** -- it queries session data to route `code` invocations. The database file lives at the extension's `globalStorageUri` path, readable by both processes.
+This Code is a two-process system with a shared SQLite database. The VS Code extension (TypeScript) is the **writer** -- it records session data. The Rust CLI is the **reader** -- it queries session data to route `code` invocations. The database file lives at the extension's `globalStorageUri` path, readable by both processes.
 
 ```
 +-----------------------------------------------------------+
@@ -14,7 +14,7 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 |  $ code ~/project                                          |
 |       |                                                    |
 |       v                                                    |
-|  ~/.which-code/bin/code  (Rust binary, leftmost in PATH)   |
+|  ~/.this-code/bin/code  (Rust binary, leftmost in PATH)   |
 |       |                                                    |
 |       +-- reads SQLite DB for routing context              |
 |       |       (globalStorageUri path, WAL mode, read-only) |
@@ -31,7 +31,7 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 |                                                            |
 |  Extension Host (local)                                    |
 |  +--------------------------------------------------+      |
-|  |  whardier.which-code extension                    |      |
+|  |  whardier.this-code extension                    |      |
 |  |                                                   |      |
 |  |  activate()                                       |      |
 |  |    +-- Open/create SQLite DB at globalStorageUri   |      |
@@ -51,12 +51,12 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 
 ### Component Boundaries
 
-| Component | Responsibility | Communicates With | Language |
-|-----------|---------------|-------------------|----------|
-| VS Code Extension | Records invocation data, tracks open files | SQLite DB (write), VS Code API (read) | TypeScript |
-| SQLite Database | Persistent storage of session records | Extension (writer), CLI (reader) | N/A (file) |
-| Rust CLI (`which-code`) | Intercepts `code` command, queries routing context, passes through to real binary | SQLite DB (read), shell PATH (read/modify), real `code` binary (exec) | Rust |
-| Shell Integration | Injects CLI into PATH, provides shell functions | User's shell (bash/zsh/fish), PATH env | Shell script |
+| Component              | Responsibility                                                                    | Communicates With                                                     | Language     |
+| ---------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------ |
+| VS Code Extension      | Records invocation data, tracks open files                                        | SQLite DB (write), VS Code API (read)                                 | TypeScript   |
+| SQLite Database        | Persistent storage of session records                                             | Extension (writer), CLI (reader)                                      | N/A (file)   |
+| Rust CLI (`this-code`) | Intercepts `code` command, queries routing context, passes through to real binary | SQLite DB (read), shell PATH (read/modify), real `code` binary (exec) | Rust         |
+| Shell Integration      | Injects CLI into PATH, provides shell functions                                   | User's shell (bash/zsh/fish), PATH env                                | Shell script |
 
 ### Data Flow
 
@@ -64,7 +64,7 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 
 1. VS Code starts, extension activates via `onStartupFinished`
 2. Extension reads: `vscode.workspace.workspaceFolders`, `vscode.env.remoteName`, `vscode.env.appRoot`
-3. Extension opens SQLite at `context.globalStorageUri` + `/which-code.db`
+3. Extension opens SQLite at `context.globalStorageUri` + `/this-code.db`
 4. Extension inserts one invocation row with current session metadata
 5. Extension subscribes to `workspace.onDidOpenTextDocument` and `workspace.onDidCloseTextDocument`
 6. On file open/close events, extension updates the `open_files` JSON column for the current invocation row
@@ -72,7 +72,7 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 **Read path (CLI -> Database):**
 
 1. User runs `code ~/project` from shell
-2. Shell resolves to `~/.which-code/bin/code` (leftmost in PATH)
+2. Shell resolves to `~/.this-code/bin/code` (leftmost in PATH)
 3. Rust binary reads SQLite DB in WAL mode (read-only connection)
 4. CLI queries for matching workspace, profile, or routing hints
 5. CLI strips its own directory from PATH
@@ -84,12 +84,12 @@ Which Code is a two-process system with a shared SQLite database. The VS Code ex
 
 The extension accesses storage via `context.globalStorageUri`, which resolves to a per-extension directory. **Confidence: HIGH** (official docs + community verification).
 
-| Platform | Path |
-|----------|------|
-| **macOS** | `~/Library/Application Support/Code/User/globalStorage/whardier.which-code/` |
-| **Linux** | `~/.config/Code/User/globalStorage/whardier.which-code/` |
+| Platform  | Path                                                                        |
+| --------- | --------------------------------------------------------------------------- |
+| **macOS** | `~/Library/Application Support/Code/User/globalStorage/whardier.this-code/` |
+| **Linux** | `~/.config/Code/User/globalStorage/whardier.this-code/`                     |
 
-The database file should be created at `${globalStorageUri.fsPath}/which-code.db`.
+The database file should be created at `${globalStorageUri.fsPath}/this-code.db`.
 
 **Critical note:** The extension must call `vscode.workspace.fs.createDirectory(context.globalStorageUri)` before first write -- the directory may not exist on first activation.
 
@@ -99,15 +99,15 @@ The database file should be created at `${globalStorageUri.fsPath}/which-code.db
 
 Returns a `string | undefined`. **Confidence: HIGH** (official API reference).
 
-| Context | Value |
-|---------|-------|
-| Local workspace | `undefined` |
-| SSH Remote | `"ssh-remote"` |
-| Dev Container | `"attached-container"` or `"dev-container"` |
-| WSL | `"wsl"` |
-| Codespaces | `"codespaces"` |
+| Context         | Value                                       |
+| --------------- | ------------------------------------------- |
+| Local workspace | `undefined`                                 |
+| SSH Remote      | `"ssh-remote"`                              |
+| Dev Container   | `"attached-container"` or `"dev-container"` |
+| WSL             | `"wsl"`                                     |
+| Codespaces      | `"codespaces"`                              |
 
-**Architectural implication:** The Which Code extension must run on the **local** machine (not the remote Extension Host) because it writes to the local `globalStorageUri`. Set `"extensionKind": ["ui"]` in `package.json` to force local execution.
+**Architectural implication:** The This Code extension must run on the **local** machine (not the remote Extension Host) because it writes to the local `globalStorageUri`. Set `"extensionKind": ["ui"]` in `package.json` to force local execution.
 
 When `remoteName` is defined, the extension should record it in the invocation row. This tells the CLI that the session involves a remote workspace, which is critical for routing `code` vs `remote-code` calls.
 
@@ -115,9 +115,9 @@ When `remoteName` is defined, the extension should record it in the invocation r
 
 Returns a `string` -- the VS Code installation root. **Confidence: HIGH**.
 
-| Platform | Typical Value |
-|----------|---------------|
-| **macOS** | `/Applications/Visual Studio Code.app/Contents/Resources/app` |
+| Platform  | Typical Value                                                      |
+| --------- | ------------------------------------------------------------------ |
+| **macOS** | `/Applications/Visual Studio Code.app/Contents/Resources/app`      |
 | **Linux** | `/usr/share/code/resources/app` (system install) or extracted path |
 
 This is the `local_ide_path` field in the database. For remote sessions, the remote VS Code Server path is at `~/.vscode-server/` on the remote host (but the extension records the local path, since it runs locally).
@@ -157,6 +157,7 @@ deactivate() called
 ```
 
 **Key lifecycle facts:**
+
 - `onStartupFinished` is preferred over `*` because it does not slow VS Code startup. The extension activates after the window is ready.
 - `deactivate()` must return a `Promise` if cleanup is async. VS Code gives limited time for cleanup -- keep it fast.
 - All subscriptions pushed to `context.subscriptions` are auto-disposed before `deactivate()` is called.
@@ -164,14 +165,16 @@ deactivate() called
 
 ### Remote Extension Architecture
 
-The Which Code extension MUST declare `"extensionKind": ["ui"]` in its `package.json`. This forces the extension to run in the **local Extension Host**, even when connected to a remote workspace.
+The This Code extension MUST declare `"extensionKind": ["ui"]` in its `package.json`. This forces the extension to run in the **local Extension Host**, even when connected to a remote workspace.
 
 Rationale:
+
 - The extension writes to `globalStorageUri`, which is a **local** path
 - The Rust CLI reads this same database from the **local** filesystem
 - If the extension ran in the Remote Extension Host, it would write to the remote machine's filesystem, making the database invisible to the local CLI
 
 When VS Code is connected to a remote (SSH, container, WSL):
+
 - The extension still runs locally
 - `vscode.env.remoteName` returns the remote type (e.g., `"ssh-remote"`)
 - `vscode.workspace.workspaceFolders` returns the remote workspace paths
@@ -182,6 +185,7 @@ When VS Code is connected to a remote (SSH, container, WSL):
 The `remote_server_path` in the database schema captures where the VS Code Server is installed on the remote machine. By default this is `~/.vscode-server/` on the remote host.
 
 **How to obtain it from the extension:** The extension running locally does not have direct access to the remote server path. Options:
+
 1. **Convention-based:** Default to `~/.vscode-server/` (correct for >95% of cases)
 2. **Settings-based:** Read `remote.SSH.serverInstallPath` from VS Code settings, which maps hostnames to custom paths
 3. **Store as nullable:** Record `null` when not in a remote session
@@ -217,6 +221,7 @@ CREATE INDEX IF NOT EXISTS idx_invocations_time
 ```
 
 **Schema design notes:**
+
 - `open_files` is a JSON array updated in-place as documents open/close. Use SQLite's JSON1 extension (`json_insert`, `json_remove`) or replace the whole value.
 - `invoked_at` uses ISO 8601 with milliseconds for precise ordering.
 - `remote_name` is separated from the original spec's `remote_server_path` for cleaner querying.
@@ -226,11 +231,11 @@ CREATE INDEX IF NOT EXISTS idx_invocations_time
 
 **Recommendation: `@vscode/sqlite3`** -- Microsoft's own fork of node-sqlite3, purpose-built for VS Code extensions.
 
-| Option | Pros | Cons | Verdict |
-|--------|------|------|---------|
-| `@vscode/sqlite3` | Prebuilt N-API binaries for macOS (x64, arm64), Linux (x64, arm64, glibc, musl); maintained by Microsoft; async API | Async-only (callback style, needs promisify wrapper) | **Use this** |
-| `better-sqlite3` | Synchronous API, fast | Native addon requires rebuild for Electron; notorious compatibility issues in VS Code extensions; users may need C++ toolchain | Avoid |
-| `sql.js` (WASM) | Zero native deps, works everywhere | In-memory only; must serialize entire DB to disk on every change; no WAL mode support; terrible for concurrent access from CLI | Avoid |
+| Option            | Pros                                                                                                                | Cons                                                                                                                           | Verdict      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------ |
+| `@vscode/sqlite3` | Prebuilt N-API binaries for macOS (x64, arm64), Linux (x64, arm64, glibc, musl); maintained by Microsoft; async API | Async-only (callback style, needs promisify wrapper)                                                                           | **Use this** |
+| `better-sqlite3`  | Synchronous API, fast                                                                                               | Native addon requires rebuild for Electron; notorious compatibility issues in VS Code extensions; users may need C++ toolchain | Avoid        |
+| `sql.js` (WASM)   | Zero native deps, works everywhere                                                                                  | In-memory only; must serialize entire DB to disk on every change; no WAL mode support; terrible for concurrent access from CLI | Avoid        |
 
 **Confidence: HIGH** -- `@vscode/sqlite3` is what VS Code itself uses internally, ships prebuilt binaries for all target platforms, and uses Node-API for version-independent compatibility.
 
@@ -249,6 +254,7 @@ CREATE INDEX IF NOT EXISTS idx_invocations_time
 The pyenv/rbenv shim pattern is the gold standard for PATH interception. Key mechanisms:
 
 **1. Shim Script (the interceptor):**
+
 ```bash
 #!/usr/bin/env bash
 # Every shim is identical -- captures its own name, delegates to the tool
@@ -258,6 +264,7 @@ exec pyenv exec "$program" "$@"
 ```
 
 **2. PATH Stripping (avoiding self-invocation):**
+
 ```bash
 # pyenv's remove_from_path function
 remove_from_path() {
@@ -275,24 +282,27 @@ PATH="$(remove_from_path "$SHIMS_DIR")" command -v python
 ```
 
 **3. Shell Init (injecting into PATH):**
+
 ```bash
 # Added to ~/.bashrc or ~/.zshrc
 eval "$(pyenv init -)"   # Prepends shims dir to PATH, installs shell function
 ```
 
-### Which Code's Adaptation
+### This Code's Adaptation
 
-The which-code pattern is simpler than pyenv because:
+The this-code pattern is simpler than pyenv because:
+
 - There is only one binary to intercept (`code`), not dozens
 - There is no version selection logic, just pass-through with routing
 - The CLI is a compiled Rust binary, not a shell script shim
 
-**Shell Integration (`~/.which-code/bin/which-code.sh`):**
+**Shell Integration (`~/.this-code/bin/this-code.sh`):**
+
 ```bash
 # Sourced by user's shell profile (~/.bashrc, ~/.zshrc)
-# Prepends which-code's bin directory to PATH
+# Prepends this-code's bin directory to PATH
 
-export WHICH_CODE_HOME="${WHICH_CODE_HOME:-$HOME/.which-code}"
+export WHICH_CODE_HOME="${WHICH_CODE_HOME:-$HOME/.this-code}"
 
 # Only add once (idempotent)
 case ":${PATH}:" in
@@ -308,20 +318,20 @@ esac
 2. Get own canonical path: fs::canonicalize(current_exe)
 3. Split PATH into components: env::var("PATH").split(':')
 4. Filter out entries where:
-   - The directory is the which-code bin dir, OR
+   - The directory is the this-code bin dir, OR
    - The directory contains a `code` that resolves to our own binary
 5. Search remaining PATH entries for `code` binary
 6. If found: exec it with original arguments
 7. If not found: error ("cannot find real `code` binary")
 ```
 
-**Critical detail:** The Rust binary must use `std::env::current_exe()` (which follows symlinks on most platforms) and compare canonical paths, not just string-compare directory names. This handles cases where `~/.which-code/bin/code` is a symlink to the actual binary.
+**Critical detail:** The Rust binary must use `std::env::current_exe()` (which follows symlinks on most platforms) and compare canonical paths, not just string-compare directory names. This handles cases where `~/.this-code/bin/code` is a symlink to the actual binary.
 
 ### fish Shell Variant
 
 ```fish
-# ~/.config/fish/conf.d/which-code.fish
-set -gx WHICH_CODE_HOME "$HOME/.which-code"
+# ~/.config/fish/conf.d/this-code.fish
+set -gx WHICH_CODE_HOME "$HOME/.this-code"
 if not contains "$WHICH_CODE_HOME/bin" $PATH
     set -gx PATH "$WHICH_CODE_HOME/bin" $PATH
 end
@@ -334,36 +344,41 @@ The CLI needs to find the SQLite database. Since `globalStorageUri` is determine
 **Strategy (ordered by priority):**
 
 1. **Environment variable:** `WHICH_CODE_DB` -- explicit override, useful for testing
-2. **Config file:** `~/.which-code/config.toml` with `db_path = "..."` (managed by figment)
+2. **Config file:** `~/.this-code/config.toml` with `db_path = "..."` (managed by figment)
 3. **Convention:** Search known `globalStorageUri` paths:
-   - macOS: `~/Library/Application Support/Code/User/globalStorage/whardier.which-code/which-code.db`
-   - Linux: `~/.config/Code/User/globalStorage/whardier.which-code/which-code.db`
-4. **Extension writes config:** On first activation, the extension writes the resolved `globalStorageUri` path to `~/.which-code/config.toml`
+   - macOS: `~/Library/Application Support/Code/User/globalStorage/whardier.this-code/this-code.db`
+   - Linux: `~/.config/Code/User/globalStorage/whardier.this-code/this-code.db`
+4. **Extension writes config:** On first activation, the extension writes the resolved `globalStorageUri` path to `~/.this-code/config.toml`
 
 **Recommendation:** Use strategy 4 (extension writes config) as primary, with strategy 3 as fallback. The extension knows the exact path; the CLI should not guess. On activate, the extension:
+
 1. Resolves `context.globalStorageUri.fsPath`
-2. Writes `db_path = "<resolved path>"` to `~/.which-code/config.toml`
+2. Writes `db_path = "<resolved path>"` to `~/.this-code/config.toml`
 
 This handles profile-specific paths, custom `--user-data-dir`, and any future changes to VS Code's storage layout.
 
 ## Patterns to Follow
 
 ### Pattern 1: Append-Only Event Log
+
 **What:** Never update or delete invocation rows. Each `code` launch creates exactly one row. File open/close events update only the `open_files` column of the current session's row.
 **When:** Always -- this is the core data model.
 **Why:** Simplifies concurrency (no conflicts between writer and reader), provides full history, and avoids complex state management.
 
 ### Pattern 2: WAL Mode for Cross-Process Access
+
 **What:** Set `PRAGMA journal_mode=WAL` on database creation. Extension writes, CLI reads. Neither blocks the other.
 **When:** Always -- this is non-negotiable for the two-process architecture.
 **Why:** Without WAL, the CLI would get `SQLITE_BUSY` errors whenever the extension is writing, and vice versa.
 
 ### Pattern 3: Extension as UI-Only (extensionKind)
+
 **What:** Declare `"extensionKind": ["ui"]` in `package.json` to force local execution.
 **When:** Always -- the extension must write to the local filesystem.
 **Why:** If the extension runs remotely, the database would be on the remote machine, invisible to the local CLI.
 
 ### Pattern 4: Idempotent Shell Integration
+
 **What:** The shell init script checks if the path is already added before prepending.
 **When:** Always -- users may source their profile multiple times.
 **Why:** Prevents PATH pollution and duplicate entries (a common pyenv/rbenv issue).
@@ -371,22 +386,26 @@ This handles profile-specific paths, custom `--user-data-dir`, and any future ch
 ## Anti-Patterns to Avoid
 
 ### Anti-Pattern 1: Using sql.js for Shared Database
+
 **What:** Using the WASM SQLite library (sql.js) which operates in-memory.
 **Why bad:** sql.js cannot support concurrent cross-process access. It loads the entire database into memory, operates on it, and writes the whole file back. A CLI reading the file while sql.js is writing would see corrupt data or a truncated file. No WAL mode support.
 **Instead:** Use `@vscode/sqlite3` with native bindings and WAL mode.
 
 ### Anti-Pattern 2: Hardcoding globalStorageUri Paths
+
 **What:** Putting `~/Library/Application Support/Code/User/globalStorage/...` directly in the CLI.
 **Why bad:** The path changes with VS Code profiles, custom `--user-data-dir`, VS Code Insiders (`Code - Insiders`), and potentially future VS Code versions.
-**Instead:** Have the extension write the resolved path to `~/.which-code/config.toml`.
+**Instead:** Have the extension write the resolved path to `~/.this-code/config.toml`.
 
 ### Anti-Pattern 3: Running Extension as Workspace Extension
+
 **What:** Allowing the extension to run in the Remote Extension Host.
 **Why bad:** The database would be written to the remote machine's filesystem. The local CLI cannot read it. The entire architecture breaks.
 **Instead:** Force `"extensionKind": ["ui"]`.
 
 ### Anti-Pattern 4: String-Comparing PATH Entries for Self-Detection
-**What:** Checking if a PATH entry string-equals `~/.which-code/bin`.
+
+**What:** Checking if a PATH entry string-equals `~/.this-code/bin`.
 **Why bad:** Fails with symlinks, relative paths, trailing slashes, `$HOME` vs `~`, and case differences on macOS.
 **Instead:** Canonicalize paths with `fs::canonicalize()` and compare canonical forms.
 
@@ -403,23 +422,23 @@ This handles profile-specific paths, custom `--user-data-dir`, and any future ch
 
 ### Build Phases
 
-| Phase | Component | Deliverable | Depends On |
-|-------|-----------|-------------|------------|
-| 1 | VS Code Extension (core) | Extension that records invocations to SQLite on activate | Nothing |
-| 2 | VS Code Extension (events) | File open/close tracking, manifest updates | Phase 1 |
-| 3 | Rust CLI (read + pass-through) | CLI that reads DB and execs real `code` | Phase 1 schema |
-| 4 | Shell Integration | Shell scripts for bash/zsh/fish, PATH injection | Phase 3 binary |
-| 5 | Extension writes CLI config | Extension writes `config.toml` with DB path | Phase 1 + Phase 3 |
-| 6 | Integration testing | End-to-end: shell -> CLI -> VS Code -> extension -> DB -> CLI reads | All prior phases |
+| Phase | Component                      | Deliverable                                                         | Depends On        |
+| ----- | ------------------------------ | ------------------------------------------------------------------- | ----------------- |
+| 1     | VS Code Extension (core)       | Extension that records invocations to SQLite on activate            | Nothing           |
+| 2     | VS Code Extension (events)     | File open/close tracking, manifest updates                          | Phase 1           |
+| 3     | Rust CLI (read + pass-through) | CLI that reads DB and execs real `code`                             | Phase 1 schema    |
+| 4     | Shell Integration              | Shell scripts for bash/zsh/fish, PATH injection                     | Phase 3 binary    |
+| 5     | Extension writes CLI config    | Extension writes `config.toml` with DB path                         | Phase 1 + Phase 3 |
+| 6     | Integration testing            | End-to-end: shell -> CLI -> VS Code -> extension -> DB -> CLI reads | All prior phases  |
 
 ## Scalability Considerations
 
-| Concern | At 10 sessions | At 1,000 sessions | At 100,000 sessions |
-|---------|----------------|---------------------|----------------------|
-| DB size | <100 KB | ~5 MB | ~500 MB |
-| Query speed | Instant | Instant (indexed) | Add LIMIT, consider pruning old rows |
-| WAL file growth | Negligible | Checkpoint automatically | Set `PRAGMA wal_autocheckpoint` |
-| open_files JSON size | <1 KB per row | Same | Could be large if 100+ files open; cap array length |
+| Concern              | At 10 sessions | At 1,000 sessions        | At 100,000 sessions                                 |
+| -------------------- | -------------- | ------------------------ | --------------------------------------------------- |
+| DB size              | <100 KB        | ~5 MB                    | ~500 MB                                             |
+| Query speed          | Instant        | Instant (indexed)        | Add LIMIT, consider pruning old rows                |
+| WAL file growth      | Negligible     | Checkpoint automatically | Set `PRAGMA wal_autocheckpoint`                     |
+| open_files JSON size | <1 KB per row  | Same                     | Could be large if 100+ files open; cap array length |
 
 **Pruning strategy:** Not needed for v1. If the database grows, add a `PRAGMA auto_vacuum=INCREMENTAL` and a periodic cleanup command to the CLI.
 

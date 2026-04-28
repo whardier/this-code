@@ -7,6 +7,7 @@
 ---
 
 <user_constraints>
+
 ## User Constraints (from CONTEXT.md)
 
 ### Locked Decisions
@@ -16,7 +17,7 @@
 - **D-03 (EXT-05):** Two settings only — `thisCode.enable` (boolean, default true) and `thisCode.logLevel` ("off"|"info"|"debug", default "info"). No other settings in Phase 1.
 - **D-04 (STOR-01 local):** Local session JSON at `~/.this-code/sessions/{hash}.json`; hash derived from `vscode.env.appRoot` or VS Code version string.
 - **D-05 (STOR-01 SSH):** Remote session JSON at `~/.vscode-server/bin/{commit-hash}/this-code-session.json`.
-- **D-06 (all paths):** All storage under `~/.this-code/` — SQLite at `~/.this-code/sessions.db`, local JSONs at `~/.this-code/sessions/`, CLI binary at `~/.this-code/bin/` (Phase 2). REQUIREMENTS.md and PROJECT.md `~/.which-code/` references are superseded by D-06.
+- **D-06 (all paths):** All storage under `~/.this-code/` — SQLite at `~/.this-code/sessions.db`, local JSONs at `~/.this-code/sessions/`, CLI binary at `~/.this-code/bin/` (Phase 2). REQUIREMENTS.md and PROJECT.md `~/.this-code/` references are superseded by D-06.
 - **@vscode/sqlite3** (not better-sqlite3) — locked.
 - **WAL mode + PRAGMA busy_timeout=5000** — locked.
 - **esbuild bundler with `@vscode/sqlite3` as external** — locked.
@@ -40,31 +41,33 @@
 - `thisCode.excludePatterns`
 - Startup scan performance tuning (revisit post-Phase 1)
 - CLI, shell integration, routing logic
-</user_constraints>
+  </user_constraints>
 
 ---
 
 <phase_requirements>
+
 ## Phase Requirements
 
-| ID | Description | Research Support |
-|----|-------------|------------------|
-| EXT-01 | Extension ID `whardier.this-code`; marketplace name "This Code" | package.json manifest pattern documented |
-| EXT-02 | `extensionKind: ["workspace"]` | Locked. Runs on remote host during SSH. Documented in PITFALLS.md Pitfall 9. |
-| EXT-03 | Activates on `onStartupFinished` | Locked. Non-blocking; fires per window. API verified. |
-| EXT-04 | No UI; config-only + OutputChannel | Standard VS Code pattern; no `contributes.commands` needed |
-| EXT-05 | Two VS Code settings: `thisCode.enable` + `thisCode.logLevel` | `contributes.configuration` schema documented below |
-| STOR-01 | Per-instance JSON at well-known paths | D-04 (local) and D-05 (SSH remote) define exact paths |
-| STOR-02 | SQLite at `~/.this-code/sessions.db` WAL mode + busy timeout | @vscode/sqlite3 async API + PRAGMA sequence documented |
-| STOR-03 | Schema: id, recorded_at, workspace_path, user_data_dir, profile, server_commit_hash, server_bin_path, open_files | invocations table schema from STACK.md; locked |
-| STOR-04 | Scan `~/.vscode-server/bin/*/` at activation to index existing sessions | fs.readdir + async iteration pattern documented |
-| STOR-05 | Create `~/.this-code/` directory on first activation | os.homedir() + fs.mkdir({ recursive: true }) pattern |
-| TRACK-01 | Record workspace root path | `vscode.workspace.workspaceFolders[0].uri.fsPath` |
-| TRACK-02 | Record VS Code Server commit hash | Parse from `vscode.env.appRoot` — path segment extraction documented |
-| TRACK-03 | Record `--user-data-dir` and `--profile` via `globalStorageUri` parsing | D-01; path segment approach documented; MEDIUM confidence on profile parsing |
-| TRACK-04 | Open file manifest on open/close events | D-02; rebuild from `vscode.workspace.textDocuments`; false-positive mitigation documented |
-| TRACK-05 | Do NOT trigger on file save | Open/close events only; no `onDidSaveTextDocument` registration |
-| PLAT-01 | macOS and Linux primary | Path differences documented; `os.homedir()` handles both |
+| ID       | Description                                                                                                      | Research Support                                                                          |
+| -------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| EXT-01   | Extension ID `whardier.this-code`; marketplace name "This Code"                                                  | package.json manifest pattern documented                                                  |
+| EXT-02   | `extensionKind: ["workspace"]`                                                                                   | Locked. Runs on remote host during SSH. Documented in PITFALLS.md Pitfall 9.              |
+| EXT-03   | Activates on `onStartupFinished`                                                                                 | Locked. Non-blocking; fires per window. API verified.                                     |
+| EXT-04   | No UI; config-only + OutputChannel                                                                               | Standard VS Code pattern; no `contributes.commands` needed                                |
+| EXT-05   | Two VS Code settings: `thisCode.enable` + `thisCode.logLevel`                                                    | `contributes.configuration` schema documented below                                       |
+| STOR-01  | Per-instance JSON at well-known paths                                                                            | D-04 (local) and D-05 (SSH remote) define exact paths                                     |
+| STOR-02  | SQLite at `~/.this-code/sessions.db` WAL mode + busy timeout                                                     | @vscode/sqlite3 async API + PRAGMA sequence documented                                    |
+| STOR-03  | Schema: id, recorded_at, workspace_path, user_data_dir, profile, server_commit_hash, server_bin_path, open_files | invocations table schema from STACK.md; locked                                            |
+| STOR-04  | Scan `~/.vscode-server/bin/*/` at activation to index existing sessions                                          | fs.readdir + async iteration pattern documented                                           |
+| STOR-05  | Create `~/.this-code/` directory on first activation                                                             | os.homedir() + fs.mkdir({ recursive: true }) pattern                                      |
+| TRACK-01 | Record workspace root path                                                                                       | `vscode.workspace.workspaceFolders[0].uri.fsPath`                                         |
+| TRACK-02 | Record VS Code Server commit hash                                                                                | Parse from `vscode.env.appRoot` — path segment extraction documented                      |
+| TRACK-03 | Record `--user-data-dir` and `--profile` via `globalStorageUri` parsing                                          | D-01; path segment approach documented; MEDIUM confidence on profile parsing              |
+| TRACK-04 | Open file manifest on open/close events                                                                          | D-02; rebuild from `vscode.workspace.textDocuments`; false-positive mitigation documented |
+| TRACK-05 | Do NOT trigger on file save                                                                                      | Open/close events only; no `onDidSaveTextDocument` registration                           |
+| PLAT-01  | macOS and Linux primary                                                                                          | Path differences documented; `os.homedir()` handles both                                  |
+
 </phase_requirements>
 
 ---
@@ -83,15 +86,15 @@ The extension project does not yet exist as TypeScript source. Phase 1 creates i
 
 ## Architectural Responsibility Map
 
-| Capability | Primary Tier | Secondary Tier | Rationale |
-|------------|-------------|----------------|-----------|
-| Session recording (invocation row) | Extension (workspace host) | — | Extension runs where the workspace is; VS Code APIs for path/env only available here |
-| SQLite schema creation + WAL setup | Extension (workspace host) | — | Extension is sole writer; CLI is reader-only |
-| Per-instance JSON file write | Extension (workspace host) | — | Collocated with VS Code Server binary on same filesystem |
-| Open file tracking | Extension (workspace host) | — | `vscode.workspace.textDocuments` only accessible in extension host |
-| Startup scan of existing sessions | Extension (workspace host) | — | Needs filesystem access to `~/.vscode-server/bin/*/` on the host where it activates |
-| Configuration settings | VS Code (contributes.configuration) | Extension reads via `vscode.workspace.getConfiguration` | Settings surface is VS Code's responsibility; extension reads and respects |
-| Path construction (home dir) | Extension (Node.js os.homedir) | — | Platform-agnostic; works on macOS, Linux, SSH remote host |
+| Capability                         | Primary Tier                        | Secondary Tier                                          | Rationale                                                                            |
+| ---------------------------------- | ----------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Session recording (invocation row) | Extension (workspace host)          | —                                                       | Extension runs where the workspace is; VS Code APIs for path/env only available here |
+| SQLite schema creation + WAL setup | Extension (workspace host)          | —                                                       | Extension is sole writer; CLI is reader-only                                         |
+| Per-instance JSON file write       | Extension (workspace host)          | —                                                       | Collocated with VS Code Server binary on same filesystem                             |
+| Open file tracking                 | Extension (workspace host)          | —                                                       | `vscode.workspace.textDocuments` only accessible in extension host                   |
+| Startup scan of existing sessions  | Extension (workspace host)          | —                                                       | Needs filesystem access to `~/.vscode-server/bin/*/` on the host where it activates  |
+| Configuration settings             | VS Code (contributes.configuration) | Extension reads via `vscode.workspace.getConfiguration` | Settings surface is VS Code's responsibility; extension reads and respects           |
+| Path construction (home dir)       | Extension (Node.js os.homedir)      | —                                                       | Platform-agnostic; works on macOS, Linux, SSH remote host                            |
 
 ---
 
@@ -99,30 +102,31 @@ The extension project does not yet exist as TypeScript source. Phase 1 creates i
 
 ### Core
 
-| Library | Version | Purpose | Why Standard |
-|---------|---------|---------|--------------|
-| TypeScript | ~5.7 [VERIFIED: npm 6.0.3 current] | Extension language | Strict mode required; VS Code extension convention |
-| @types/vscode | ^1.75.0 [VERIFIED: npm 1.116.0 current] | VS Code API types | Pin to minimum engine, not latest — avoids using APIs unavailable on older editors |
-| @vscode/sqlite3 | ^5.1.12-vscode [VERIFIED: npm 5.1.12-vscode current] | SQLite access | Microsoft-maintained Node-API fork; ABI-stable across Electron; only viable native SQLite option |
-| esbuild | ^0.28.0 [VERIFIED: npm 0.28.0 current] | Bundler | Official VS Code recommendation; marks native modules as external |
-| @vscode/vsce | ^3.9.0 [VERIFIED: npm 3.9.1 current] | VSIX packaging | Official CLI for platform-targeted VSIX builds |
+| Library         | Version                                              | Purpose            | Why Standard                                                                                     |
+| --------------- | ---------------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------ |
+| TypeScript      | ~5.7 [VERIFIED: npm 6.0.3 current]                   | Extension language | Strict mode required; VS Code extension convention                                               |
+| @types/vscode   | ^1.75.0 [VERIFIED: npm 1.116.0 current]              | VS Code API types  | Pin to minimum engine, not latest — avoids using APIs unavailable on older editors               |
+| @vscode/sqlite3 | ^5.1.12-vscode [VERIFIED: npm 5.1.12-vscode current] | SQLite access      | Microsoft-maintained Node-API fork; ABI-stable across Electron; only viable native SQLite option |
+| esbuild         | ^0.28.0 [VERIFIED: npm 0.28.0 current]               | Bundler            | Official VS Code recommendation; marks native modules as external                                |
+| @vscode/vsce    | ^3.9.0 [VERIFIED: npm 3.9.1 current]                 | VSIX packaging     | Official CLI for platform-targeted VSIX builds                                                   |
 
 ### Supporting (dev)
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| @vscode/test-cli | ^0.0.12 [VERIFIED: npm 0.0.12] | Test runner | Extension integration tests run inside VS Code |
-| @vscode/test-electron | ^2.5.2 [VERIFIED: npm 2.5.2] | Test host | Provides real VS Code instance for test execution |
+| Library               | Version                        | Purpose     | When to Use                                       |
+| --------------------- | ------------------------------ | ----------- | ------------------------------------------------- |
+| @vscode/test-cli      | ^0.0.12 [VERIFIED: npm 0.0.12] | Test runner | Extension integration tests run inside VS Code    |
+| @vscode/test-electron | ^2.5.2 [VERIFIED: npm 2.5.2]   | Test host   | Provides real VS Code instance for test execution |
 
 ### Alternatives Considered
 
-| Instead of | Could Use | Tradeoff |
-|------------|-----------|----------|
-| @vscode/sqlite3 | better-sqlite3 | better-sqlite3 has NODE_MODULE_VERSION mismatch with Electron; rejected |
-| @vscode/sqlite3 | sql.js | In-memory only; no WAL; no concurrent CLI access; rejected |
-| esbuild | webpack | esbuild simpler, faster, officially recommended; webpack has no advantage here |
+| Instead of      | Could Use      | Tradeoff                                                                       |
+| --------------- | -------------- | ------------------------------------------------------------------------------ |
+| @vscode/sqlite3 | better-sqlite3 | better-sqlite3 has NODE_MODULE_VERSION mismatch with Electron; rejected        |
+| @vscode/sqlite3 | sql.js         | In-memory only; no WAL; no concurrent CLI access; rejected                     |
+| esbuild         | webpack        | esbuild simpler, faster, officially recommended; webpack has no advantage here |
 
 **Installation (extension directory):**
+
 ```bash
 npm install @vscode/sqlite3
 npm install -D typescript @types/vscode esbuild @vscode/vsce @vscode/test-cli @vscode/test-electron
@@ -201,9 +205,9 @@ prek.toml                       # Git hooks (existing)
 
 ```typescript
 // Source: STACK.md + node-sqlite3 API pattern
-import sqlite3 from '@vscode/sqlite3';
-import * as path from 'path';
-import * as os from 'os';
+import sqlite3 from "@vscode/sqlite3";
+import * as path from "path";
+import * as os from "os";
 
 export class Database {
   private db: sqlite3.Database;
@@ -216,10 +220,14 @@ export class Database {
 
   run(sql: string, params: unknown[] = []): Promise<sqlite3.RunResult> {
     return new Promise((resolve, reject) => {
-      this.db.run(sql, params, function (this: sqlite3.RunResult, err: Error | null) {
-        if (err) reject(err);
-        else resolve(this);
-      });
+      this.db.run(
+        sql,
+        params,
+        function (this: sqlite3.RunResult, err: Error | null) {
+          if (err) reject(err);
+          else resolve(this);
+        },
+      );
     });
   }
 
@@ -260,11 +268,13 @@ The activation sequence must run PRAGMAs before any DDL. [VERIFIED: SQLite WAL d
 // Source: STACK.md schema + SQLite WAL docs
 async function initDatabase(db: Database): Promise<void> {
   // Step 1: WAL mode (must be first)
-  await db.run('PRAGMA journal_mode=WAL');
+  await db.run("PRAGMA journal_mode=WAL");
   // Step 2: Busy timeout for concurrent access from CLI
-  await db.run('PRAGMA busy_timeout=5000');
+  await db.run("PRAGMA busy_timeout=5000");
   // Step 3: Schema migration — idempotent
-  const currentVersion = await db.get<{ user_version: number }>('PRAGMA user_version');
+  const currentVersion = await db.get<{ user_version: number }>(
+    "PRAGMA user_version",
+  );
   if ((currentVersion?.user_version ?? 0) < 1) {
     await db.run(`CREATE TABLE IF NOT EXISTS invocations (
       id                 INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -281,7 +291,7 @@ async function initDatabase(db: Database): Promise<void> {
       ON invocations(workspace_path)`);
     await db.run(`CREATE INDEX IF NOT EXISTS idx_invocations_time
       ON invocations(invoked_at DESC)`);
-    await db.run('PRAGMA user_version = 1');
+    await db.run("PRAGMA user_version = 1");
   }
 }
 ```
@@ -294,14 +304,14 @@ The commit hash is the directory segment immediately after `bin/`. [VERIFIED: vs
 
 ```typescript
 // Source: vscode-server path structure, confirmed by multiple sources
-import * as path from 'path';
-import * as vscode from 'vscode';
+import * as path from "path";
+import * as vscode from "vscode";
 
 function extractCommitHash(appRoot: string): string | null {
   // appRoot for SSH remote: /home/user/.vscode-server/bin/{hash}/resources/app
   // We want the segment immediately after 'bin/'
   const parts = appRoot.split(path.sep);
-  const binIdx = parts.lastIndexOf('bin');
+  const binIdx = parts.lastIndexOf("bin");
   if (binIdx >= 0 && binIdx + 1 < parts.length) {
     const candidate = parts[binIdx + 1];
     // Commit hashes are 40-char hex strings
@@ -316,7 +326,7 @@ function extractServerBinPath(appRoot: string): string {
   // For SSH remote: ~/.vscode-server/bin/{hash}
   // For local: the appRoot itself (best available)
   const parts = appRoot.split(path.sep);
-  const binIdx = parts.lastIndexOf('bin');
+  const binIdx = parts.lastIndexOf("bin");
   if (binIdx >= 0 && binIdx + 1 < parts.length) {
     const candidate = parts[binIdx + 1];
     if (/^[0-9a-f]{40}$/i.test(candidate)) {
@@ -330,14 +340,15 @@ function deriveLocalSessionHash(appRoot: string): string {
   // For local sessions: use last path segment of appRoot as hash basis
   // Stable: VS Code doesn't change appRoot within a version
   // Collision-safe: appRoot is unique per installation
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(appRoot).digest('hex').slice(0, 16);
+  const crypto = require("crypto");
+  return crypto.createHash("sha256").update(appRoot).digest("hex").slice(0, 16);
 }
 ```
 
 ### Pattern 4: globalStorageUri Profile Parsing
 
 `globalStorageUri` is a `vscode.Uri`. Its `fsPath` for the default profile looks like:
+
 - macOS: `~/Library/Application Support/Code/User/globalStorage/whardier.this-code`
 - Linux: `~/.config/Code/User/globalStorage/whardier.this-code`
 - SSH remote: `~/.vscode-server/data/User/globalStorage/whardier.this-code`
@@ -351,11 +362,11 @@ For non-default profiles, the VS Code internal storage uses `User/profiles/{hash
 ```typescript
 // Source: Based on D-01 decision + VS Code path structure analysis
 // CONFIDENCE: MEDIUM — actual profile hash in path requires empirical validation
-import * as vscode from 'vscode';
-import * as path from 'path';
+import * as vscode from "vscode";
+import * as path from "path";
 
 function extractProfileFromGlobalStorageUri(
-  globalStorageUri: vscode.Uri
+  globalStorageUri: vscode.Uri,
 ): string | null {
   // Path segments: [..., 'User', 'profiles', '{hash}', 'globalStorage', 'whardier.this-code']
   // OR (default profile): [..., 'User', 'globalStorage', 'whardier.this-code']
@@ -364,7 +375,7 @@ function extractProfileFromGlobalStorageUri(
 
   // Look for 'profiles' segment — present only when a non-default profile is active
   // (IF VS Code actually scopes globalStorageUri per profile in newer versions)
-  const profilesIdx = parts.indexOf('profiles');
+  const profilesIdx = parts.indexOf("profiles");
   if (profilesIdx >= 0 && profilesIdx + 1 < parts.length) {
     const hashCandidate = parts[profilesIdx + 1];
     // Profile IDs are short hex hashes (e.g., 8 chars like "23d1e380")
@@ -378,7 +389,7 @@ function extractProfileFromGlobalStorageUri(
 }
 
 function extractUserDataDirFromGlobalStorageUri(
-  globalStorageUri: vscode.Uri
+  globalStorageUri: vscode.Uri,
 ): string | null {
   // The user data dir is the segment before 'User'
   // macOS: ~/Library/Application Support/Code  →  the 'Code' part
@@ -386,7 +397,7 @@ function extractUserDataDirFromGlobalStorageUri(
   // Pattern: find 'User' segment, parent is user data dir
   const fsPath = globalStorageUri.fsPath;
   const parts = fsPath.split(path.sep);
-  const userIdx = parts.indexOf('User');
+  const userIdx = parts.indexOf("User");
   if (userIdx > 0) {
     return parts.slice(0, userIdx).join(path.sep);
   }
@@ -400,31 +411,31 @@ function extractUserDataDirFromGlobalStorageUri(
 
 ```typescript
 // Source: D-04 and D-05 from CONTEXT.md
-import * as path from 'path';
-import * as os from 'os';
-import * as vscode from 'vscode';
+import * as path from "path";
+import * as os from "os";
+import * as vscode from "vscode";
 
 function getSessionJsonPath(
   remoteName: string | undefined,
   commitHash: string | null,
-  localSessionHash: string
+  localSessionHash: string,
 ): string {
   if (remoteName && commitHash) {
     // SSH remote: collocated with VS Code Server binary
     return path.join(
       os.homedir(),
-      '.vscode-server',
-      'bin',
+      ".vscode-server",
+      "bin",
       commitHash,
-      'this-code-session.json'
+      "this-code-session.json",
     );
   } else {
     // Local session
     return path.join(
       os.homedir(),
-      '.this-code',
-      'sessions',
-      `${localSessionHash}.json`
+      ".this-code",
+      "sessions",
+      `${localSessionHash}.json`,
     );
   }
 }
@@ -436,21 +447,21 @@ function getSessionJsonPath(
 
 ```typescript
 // Source: D-02 decision + issue #102737 confirmation
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
 function buildOpenFilesList(): string[] {
   return vscode.workspace.textDocuments
-    .filter(doc => !doc.isClosed && doc.uri.scheme === 'file')
-    .map(doc => doc.uri.fsPath);
+    .filter((doc) => !doc.isClosed && doc.uri.scheme === "file")
+    .map((doc) => doc.uri.fsPath);
 }
 
 // Called in both event handlers — rebuild, don't increment
 async function updateOpenFiles(db: Database, rowId: number): Promise<void> {
   const openFiles = buildOpenFilesList();
-  await db.run(
-    'UPDATE invocations SET open_files = ? WHERE id = ?',
-    [JSON.stringify(openFiles), rowId]
-  );
+  await db.run("UPDATE invocations SET open_files = ? WHERE id = ?", [
+    JSON.stringify(openFiles),
+    rowId,
+  ]);
 }
 ```
 
@@ -462,12 +473,12 @@ Scan `~/.vscode-server/bin/*/this-code-session.json` at activation to index exis
 
 ```typescript
 // Source: Node.js fs API + STOR-04 requirement
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import * as os from 'os';
+import * as fs from "fs/promises";
+import * as path from "path";
+import * as os from "os";
 
 async function scanExistingRemoteSessions(db: Database): Promise<void> {
-  const vscodeServerBin = path.join(os.homedir(), '.vscode-server', 'bin');
+  const vscodeServerBin = path.join(os.homedir(), ".vscode-server", "bin");
 
   let entries: string[];
   try {
@@ -478,15 +489,19 @@ async function scanExistingRemoteSessions(db: Database): Promise<void> {
   }
 
   for (const entry of entries) {
-    const sessionFile = path.join(vscodeServerBin, entry, 'this-code-session.json');
+    const sessionFile = path.join(
+      vscodeServerBin,
+      entry,
+      "this-code-session.json",
+    );
     try {
-      const raw = await fs.readFile(sessionFile, 'utf-8');
+      const raw = await fs.readFile(sessionFile, "utf-8");
       const session = JSON.parse(raw);
 
       // Check if already indexed (use server_commit_hash as dedup key)
       const existing = await db.get<{ id: number }>(
-        'SELECT id FROM invocations WHERE remote_server_path = ? LIMIT 1',
-        [path.join(vscodeServerBin, entry)]
+        "SELECT id FROM invocations WHERE remote_server_path = ? LIMIT 1",
+        [path.join(vscodeServerBin, entry)],
       );
       if (existing) continue; // already indexed
 
@@ -500,11 +515,11 @@ async function scanExistingRemoteSessions(db: Database): Promise<void> {
           session.workspace_path ?? null,
           session.user_data_dir ?? null,
           session.profile ?? null,
-          session.local_ide_path ?? '',
+          session.local_ide_path ?? "",
           session.remote_name ?? null,
           path.join(vscodeServerBin, entry),
           JSON.stringify(session.open_files ?? []),
-        ]
+        ],
       );
     } catch {
       // Missing file or malformed JSON — skip this entry
@@ -517,16 +532,18 @@ async function scanExistingRemoteSessions(db: Database): Promise<void> {
 
 ```typescript
 // Source: VS Code contributes.configuration API pattern [VERIFIED: official docs]
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
 function isEnabled(): boolean {
-  return vscode.workspace.getConfiguration('thisCode').get('enable', true);
+  return vscode.workspace.getConfiguration("thisCode").get("enable", true);
 }
 
-type LogLevel = 'off' | 'info' | 'debug';
+type LogLevel = "off" | "info" | "debug";
 
 function getLogLevel(): LogLevel {
-  return vscode.workspace.getConfiguration('thisCode').get('logLevel', 'info') as LogLevel;
+  return vscode.workspace
+    .getConfiguration("thisCode")
+    .get("logLevel", "info") as LogLevel;
 }
 ```
 
@@ -568,6 +585,7 @@ The extension `package.json` is separate from the root `package.json`. [VERIFIED
 ```
 
 **Key manifest notes:**
+
 - `engines.vscode: "^1.75.0"` — minimum for profile support and stable `globalStorageUri`
 - `activationEvents: ["onStartupFinished"]` — non-blocking; fires after every window loads
 - `extensionKind: ["workspace"]` — runs on the machine where files are (local or SSH remote)
@@ -577,23 +595,23 @@ The extension `package.json` is separate from the root `package.json`. [VERIFIED
 
 ```javascript
 // Source: STACK.md (locked) + VS Code bundling guide [VERIFIED: official docs]
-const esbuild = require('esbuild');
+const esbuild = require("esbuild");
 
-const production = process.argv.includes('--production');
-const watch = process.argv.includes('--watch');
+const production = process.argv.includes("--production");
+const watch = process.argv.includes("--watch");
 
 async function main() {
   const ctx = await esbuild.context({
-    entryPoints: ['src/extension.ts'],
+    entryPoints: ["src/extension.ts"],
     bundle: true,
-    format: 'cjs',
+    format: "cjs",
     minify: production,
     sourcemap: !production,
     sourcesContent: false,
-    platform: 'node',
-    outfile: 'dist/extension.js',
-    external: ['vscode', '@vscode/sqlite3'],  // CRITICAL: native module must be external
-    logLevel: 'warning',
+    platform: "node",
+    outfile: "dist/extension.js",
+    external: ["vscode", "@vscode/sqlite3"], // CRITICAL: native module must be external
+    logLevel: "warning",
   });
   if (watch) {
     await ctx.watch();
@@ -602,7 +620,10 @@ async function main() {
     await ctx.dispose();
   }
 }
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
 ```
 
 ### Pattern 11: .vscodeignore
@@ -637,13 +658,13 @@ esbuild.js
 
 ## Don't Hand-Roll
 
-| Problem | Don't Build | Use Instead | Why |
-|---------|-------------|-------------|-----|
-| SQLite binding for VS Code/Electron | Custom Node-API native addon | `@vscode/sqlite3` v5.1.12-vscode | Microsoft maintains prebuilts for all 6 platform targets |
-| Promise wrapper for callback API | Complex promisify chains | ~20-line wrapper class (Pattern 1 above) | The wrapper is simple enough to own; no third-party needed |
-| Platform path resolution | Custom HOME env var parsing | `os.homedir()` (Node.js built-in) | Handles macOS, Linux, SSH remote host correctly |
-| VSIX packaging | Custom zip assembly | `@vscode/vsce package --target` | Handles manifest validation, native module inclusion |
-| Conventional commit validation | Custom git hook script | commitizen + prek (already configured) | `prek.toml` already sets this up |
+| Problem                             | Don't Build                  | Use Instead                              | Why                                                        |
+| ----------------------------------- | ---------------------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| SQLite binding for VS Code/Electron | Custom Node-API native addon | `@vscode/sqlite3` v5.1.12-vscode         | Microsoft maintains prebuilts for all 6 platform targets   |
+| Promise wrapper for callback API    | Complex promisify chains     | ~20-line wrapper class (Pattern 1 above) | The wrapper is simple enough to own; no third-party needed |
+| Platform path resolution            | Custom HOME env var parsing  | `os.homedir()` (Node.js built-in)        | Handles macOS, Linux, SSH remote host correctly            |
+| VSIX packaging                      | Custom zip assembly          | `@vscode/vsce package --target`          | Handles manifest validation, native module inclusion       |
+| Conventional commit validation      | Custom git hook script       | commitizen + prek (already configured)   | `prek.toml` already sets this up                           |
 
 **Key insight:** The hard part is SQLite inside Electron — @vscode/sqlite3 solves it completely. Everything else is Node.js built-ins and small wrappers.
 
@@ -708,36 +729,40 @@ esbuild.js
 
 ```typescript
 // Source: VS Code extension API pattern + Phase 1 requirements
-import * as vscode from 'vscode';
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs/promises';
-import { Database, initDatabase } from './db';
-import { collectSessionMetadata, getSessionJsonPath } from './session';
-import { writeSessionJson, scanExistingRemoteSessions } from './storage';
-import { isEnabled, getLogLevel } from './config';
+import * as vscode from "vscode";
+import * as os from "os";
+import * as path from "path";
+import * as fs from "fs/promises";
+import { Database, initDatabase } from "./db";
+import { collectSessionMetadata, getSessionJsonPath } from "./session";
+import { writeSessionJson, scanExistingRemoteSessions } from "./storage";
+import { isEnabled, getLogLevel } from "./config";
 
 let db: Database | undefined;
 let outputChannel: vscode.OutputChannel | undefined;
 let currentInvocationId: number | undefined;
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  outputChannel = vscode.window.createOutputChannel('This Code');
+export async function activate(
+  context: vscode.ExtensionContext,
+): Promise<void> {
+  outputChannel = vscode.window.createOutputChannel("This Code");
   context.subscriptions.push(outputChannel);
 
   if (!isEnabled()) {
-    outputChannel.appendLine('[info] This Code is disabled via thisCode.enable setting.');
+    outputChannel.appendLine(
+      "[info] This Code is disabled via thisCode.enable setting.",
+    );
     return;
   }
 
   try {
     // 1. Ensure ~/.this-code/ exists
-    const thisCodeDir = path.join(os.homedir(), '.this-code');
+    const thisCodeDir = path.join(os.homedir(), ".this-code");
     await fs.mkdir(thisCodeDir, { recursive: true });
-    await fs.mkdir(path.join(thisCodeDir, 'sessions'), { recursive: true });
+    await fs.mkdir(path.join(thisCodeDir, "sessions"), { recursive: true });
 
     // 2. Open and initialize SQLite
-    const dbPath = path.join(thisCodeDir, 'sessions.db');
+    const dbPath = path.join(thisCodeDir, "sessions.db");
     db = new Database(dbPath);
     await initDatabase(db);
 
@@ -761,8 +786,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         metadata.local_ide_path,
         metadata.remote_name,
         metadata.remote_server_path,
-        '[]',
-      ]
+        "[]",
+      ],
     );
     currentInvocationId = result.lastID;
 
@@ -777,15 +802,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         if (db && currentInvocationId !== undefined) {
           updateOpenFiles(db, currentInvocationId);
         }
-      })
+      }),
     );
 
     // 7. Startup scan — fire and forget (do not await)
-    scanExistingRemoteSessions(db).catch(err => {
+    scanExistingRemoteSessions(db).catch((err) => {
       outputChannel?.appendLine(`[info] Startup scan error: ${err.message}`);
     });
 
-    outputChannel.appendLine(`[info] This Code activated. Invocation ID: ${currentInvocationId}`);
+    outputChannel.appendLine(
+      `[info] This Code activated. Invocation ID: ${currentInvocationId}`,
+    );
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     outputChannel.appendLine(`[info] This Code activation failed: ${msg}`);
@@ -803,13 +830,13 @@ export async function deactivate(): Promise<void> {
 
 async function updateOpenFiles(db: Database, rowId: number): Promise<void> {
   const openFiles = vscode.workspace.textDocuments
-    .filter(doc => !doc.isClosed && doc.uri.scheme === 'file')
-    .map(doc => doc.uri.fsPath);
+    .filter((doc) => !doc.isClosed && doc.uri.scheme === "file")
+    .map((doc) => doc.uri.fsPath);
   try {
-    await db.run(
-      'UPDATE invocations SET open_files = ? WHERE id = ?',
-      [JSON.stringify(openFiles), rowId]
-    );
+    await db.run("UPDATE invocations SET open_files = ? WHERE id = ?", [
+      JSON.stringify(openFiles),
+      rowId,
+    ]);
   } catch {
     // DB error during update — log and continue
   }
@@ -842,14 +869,15 @@ async function updateOpenFiles(db: Database, rowId: number): Promise<void> {
 
 ## State of the Art
 
-| Old Approach | Current Approach | When Changed | Impact |
-|--------------|------------------|--------------|--------|
+| Old Approach                           | Current Approach                     | When Changed                                | Impact                                                         |
+| -------------------------------------- | ------------------------------------ | ------------------------------------------- | -------------------------------------------------------------- |
 | `better-sqlite3` in VS Code extensions | `@vscode/sqlite3` Node-API prebuilts | VS Code adopted Node-API (N-API) ~2019-2020 | better-sqlite3 permanently broken for Marketplace distribution |
-| `"*"` activation event | `"onStartupFinished"` | VS Code 1.54 (Mar 2021) | `"*"` now shows performance warning in extension review |
-| webpack bundler | esbuild | VS Code docs updated ~2022 | esbuild is now the official recommendation; simpler config |
-| `globalStoragePath` (string) | `globalStorageUri` (Uri object) | VS Code 1.55 (Apr 2021) | Use `.fsPath` property to get string path |
+| `"*"` activation event                 | `"onStartupFinished"`                | VS Code 1.54 (Mar 2021)                     | `"*"` now shows performance warning in extension review        |
+| webpack bundler                        | esbuild                              | VS Code docs updated ~2022                  | esbuild is now the official recommendation; simpler config     |
+| `globalStoragePath` (string)           | `globalStorageUri` (Uri object)      | VS Code 1.55 (Apr 2021)                     | Use `.fsPath` property to get string path                      |
 
 **Deprecated/outdated:**
+
 - `context.globalStoragePath` (string): Deprecated in favor of `context.globalStorageUri` (Uri). Use `.fsPath` to get the path string.
 - `activationEvents: ["*"]`: Causes activation performance warnings. Use `"onStartupFinished"`.
 
@@ -863,21 +891,23 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 
 ## Environment Availability
 
-| Dependency | Required By | Available | Version | Fallback |
-|------------|------------|-----------|---------|----------|
-| Node.js | Extension build, npm | ✓ | v24.15.0 [VERIFIED] | — |
-| npm | Package install | ✓ | 11.12.1 [VERIFIED] | — |
-| TypeScript | Type checking | install via npm | — | — |
-| esbuild | Bundling | install via npm | — | — |
-| @vscode/sqlite3 | SQLite access | install via npm | 5.1.12-vscode | — |
-| Rust | Phase 2 CLI only | Not verified | — | N/A (Phase 2) |
-| prek | Git hooks | ✓ (existing prek.toml) | — [ASSUMED] | — |
-| VS Code (dev instance) | Extension testing | ✓ | developer machine | — |
+| Dependency             | Required By          | Available              | Version             | Fallback      |
+| ---------------------- | -------------------- | ---------------------- | ------------------- | ------------- |
+| Node.js                | Extension build, npm | ✓                      | v24.15.0 [VERIFIED] | —             |
+| npm                    | Package install      | ✓                      | 11.12.1 [VERIFIED]  | —             |
+| TypeScript             | Type checking        | install via npm        | —                   | —             |
+| esbuild                | Bundling             | install via npm        | —                   | —             |
+| @vscode/sqlite3        | SQLite access        | install via npm        | 5.1.12-vscode       | —             |
+| Rust                   | Phase 2 CLI only     | Not verified           | —                   | N/A (Phase 2) |
+| prek                   | Git hooks            | ✓ (existing prek.toml) | — [ASSUMED]         | —             |
+| VS Code (dev instance) | Extension testing    | ✓                      | developer machine   | —             |
 
 **Missing dependencies with no fallback:**
+
 - None that block Phase 1 execution.
 
 **Missing dependencies with fallback:**
+
 - TypeScript, esbuild, @vscode/sqlite3: installed via npm during scaffolding — not pre-installed but installation is a task step.
 
 ---
@@ -886,35 +916,35 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 
 ### Test Framework
 
-| Property | Value |
-|----------|-------|
-| Framework | @vscode/test-cli + @vscode/test-electron |
-| Config file | None yet — Wave 0 creates `.vscode-test.js` |
-| Quick run command | `npm run test` (from extension/) |
+| Property           | Value                                          |
+| ------------------ | ---------------------------------------------- |
+| Framework          | @vscode/test-cli + @vscode/test-electron       |
+| Config file        | None yet — Wave 0 creates `.vscode-test.js`    |
+| Quick run command  | `npm run test` (from extension/)               |
 | Full suite command | `npm run test` (same; single suite in Phase 1) |
 
 **Note:** VS Code extension testing requires a running VS Code instance (via @vscode/test-electron). Tests are integration tests, not unit tests — they run inside a real extension host. This means there is no sub-second unit test loop. Tests for Phase 1 verify activation succeeds, SQLite is created, and invocation rows are inserted.
 
 ### Phase Requirements to Test Map
 
-| Req ID | Behavior | Test Type | Automated Command | File Exists? |
-|--------|----------|-----------|-------------------|-------------|
-| EXT-01 | Extension ID is `whardier.this-code` | manifest check | `node -e "require('./extension/package.json').publisher+'.'+require('./extension/package.json').name"` | ❌ Wave 0 |
-| EXT-02 | extensionKind: ["workspace"] in manifest | manifest check | static JSON assertion | ❌ Wave 0 |
-| EXT-03 | Activates on onStartupFinished | integration | @vscode/test-electron activation test | ❌ Wave 0 |
-| EXT-04 | No contributes.commands in manifest | manifest check | static JSON assertion | ❌ Wave 0 |
-| EXT-05 | Two settings registered | manifest check | static JSON assertion on contributes.configuration | ❌ Wave 0 |
-| STOR-01 | JSON file written at correct path | integration | check file exists after activation | ❌ Wave 0 |
-| STOR-02 | SQLite at ~/.this-code/sessions.db with WAL | integration | sqlite3 CLI: `PRAGMA journal_mode;` → "wal" | ❌ Wave 0 |
-| STOR-03 | Schema columns present | integration | `PRAGMA table_info(invocations)` | ❌ Wave 0 |
-| STOR-04 | Startup scan indexes existing sessions | integration | pre-seed JSON file; activate; check SQLite row | ❌ Wave 0 |
-| STOR-05 | ~/.this-code/ created on activation | integration | check directory exists | ❌ Wave 0 |
-| TRACK-01 | workspace_path recorded | integration | query SQLite after activation | ❌ Wave 0 |
-| TRACK-02 | server_commit_hash extracted | integration | query SQLite; check 40-hex or null | ❌ Wave 0 |
-| TRACK-03 | user_data_dir in SQLite; profile null-safe | integration | query SQLite; no exception on any path | ❌ Wave 0 |
-| TRACK-04 | open_files updates on document event | integration | open document; query SQLite open_files | ❌ Wave 0 |
-| TRACK-05 | No onDidSaveTextDocument registration | static | grep src/ for onDidSaveTextDocument | ❌ Wave 0 |
-| PLAT-01 | macOS and Linux paths correct | integration | run on macOS (CI) + Linux (CI) | ❌ Wave 0 |
+| Req ID   | Behavior                                    | Test Type      | Automated Command                                                                                      | File Exists? |
+| -------- | ------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------ | ------------ |
+| EXT-01   | Extension ID is `whardier.this-code`        | manifest check | `node -e "require('./extension/package.json').publisher+'.'+require('./extension/package.json').name"` | ❌ Wave 0    |
+| EXT-02   | extensionKind: ["workspace"] in manifest    | manifest check | static JSON assertion                                                                                  | ❌ Wave 0    |
+| EXT-03   | Activates on onStartupFinished              | integration    | @vscode/test-electron activation test                                                                  | ❌ Wave 0    |
+| EXT-04   | No contributes.commands in manifest         | manifest check | static JSON assertion                                                                                  | ❌ Wave 0    |
+| EXT-05   | Two settings registered                     | manifest check | static JSON assertion on contributes.configuration                                                     | ❌ Wave 0    |
+| STOR-01  | JSON file written at correct path           | integration    | check file exists after activation                                                                     | ❌ Wave 0    |
+| STOR-02  | SQLite at ~/.this-code/sessions.db with WAL | integration    | sqlite3 CLI: `PRAGMA journal_mode;` → "wal"                                                            | ❌ Wave 0    |
+| STOR-03  | Schema columns present                      | integration    | `PRAGMA table_info(invocations)`                                                                       | ❌ Wave 0    |
+| STOR-04  | Startup scan indexes existing sessions      | integration    | pre-seed JSON file; activate; check SQLite row                                                         | ❌ Wave 0    |
+| STOR-05  | ~/.this-code/ created on activation         | integration    | check directory exists                                                                                 | ❌ Wave 0    |
+| TRACK-01 | workspace_path recorded                     | integration    | query SQLite after activation                                                                          | ❌ Wave 0    |
+| TRACK-02 | server_commit_hash extracted                | integration    | query SQLite; check 40-hex or null                                                                     | ❌ Wave 0    |
+| TRACK-03 | user_data_dir in SQLite; profile null-safe  | integration    | query SQLite; no exception on any path                                                                 | ❌ Wave 0    |
+| TRACK-04 | open_files updates on document event        | integration    | open document; query SQLite open_files                                                                 | ❌ Wave 0    |
+| TRACK-05 | No onDidSaveTextDocument registration       | static         | grep src/ for onDidSaveTextDocument                                                                    | ❌ Wave 0    |
+| PLAT-01  | macOS and Linux paths correct               | integration    | run on macOS (CI) + Linux (CI)                                                                         | ❌ Wave 0    |
 
 ### Sampling Rate
 
@@ -937,22 +967,22 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 
 ### Applicable ASVS Categories
 
-| ASVS Category | Applies | Standard Control |
-|---------------|---------|-----------------|
-| V2 Authentication | No | Extension has no auth surface |
-| V3 Session Management | No | Sessions are internal state, not user sessions |
-| V4 Access Control | No | No multi-user or permission model |
-| V5 Input Validation | Yes | Parse `globalStorageUri` path defensively; validate commit hash regex before use |
-| V6 Cryptography | No | SHA-256 hash for local session filename is non-cryptographic use; collision safety sufficient |
+| ASVS Category         | Applies | Standard Control                                                                              |
+| --------------------- | ------- | --------------------------------------------------------------------------------------------- |
+| V2 Authentication     | No      | Extension has no auth surface                                                                 |
+| V3 Session Management | No      | Sessions are internal state, not user sessions                                                |
+| V4 Access Control     | No      | No multi-user or permission model                                                             |
+| V5 Input Validation   | Yes     | Parse `globalStorageUri` path defensively; validate commit hash regex before use              |
+| V6 Cryptography       | No      | SHA-256 hash for local session filename is non-cryptographic use; collision safety sufficient |
 
 ### Known Threat Patterns for this Stack
 
-| Pattern | STRIDE | Standard Mitigation |
-|---------|--------|---------------------|
-| Path traversal via appRoot parsing | Tampering | Validate commit hash is 40-char hex before using in path construction |
-| SQLite injection via open file paths | Tampering | Use parameterized queries (Pattern 1) — never string interpolation |
-| Symlink attack on ~/.this-code/ | Tampering | `fs.mkdir({ recursive: true })` is safe; avoid following symlinks in startup scan |
-| JSON parsing of session files (startup scan) | Information disclosure | Wrap in try/catch; never expose parse errors to UI |
+| Pattern                                      | STRIDE                 | Standard Mitigation                                                               |
+| -------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------- |
+| Path traversal via appRoot parsing           | Tampering              | Validate commit hash is 40-char hex before using in path construction             |
+| SQLite injection via open file paths         | Tampering              | Use parameterized queries (Pattern 1) — never string interpolation                |
+| Symlink attack on ~/.this-code/              | Tampering              | `fs.mkdir({ recursive: true })` is safe; avoid following symlinks in startup scan |
+| JSON parsing of session files (startup scan) | Information disclosure | Wrap in try/catch; never expose parse errors to UI                                |
 
 **Key note:** This extension has no network access, no user authentication, and no command surface. The attack surface is limited to filesystem operations.
 
@@ -960,12 +990,12 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 
 ## Assumptions Log
 
-| # | Claim | Section | Risk if Wrong |
-|---|-------|---------|---------------|
-| A1 | `globalStorageUri` for non-default profiles includes a `profiles/{hash}` path segment that can be parsed | Pattern 4 (globalStorageUri parsing) | Profile column always null — acceptable per D-01 null-fallback design |
-| A2 | `vscode.env.appRoot` for SSH remote sessions follows `~/.vscode-server/bin/{40-hex}/resources/app` pattern | Pattern 3 (commit hash extraction) | Commit hash extraction returns null; local_ide_path still populated |
-| A3 | `prek` is installed on the developer machine | Environment Availability | First commit fails git hook; need `prek install` first |
-| A4 | VS Code 1.75+ is available on CI/test machines for @vscode/test-electron integration tests | Validation Architecture | Integration tests cannot run; manual verification only |
+| #   | Claim                                                                                                      | Section                              | Risk if Wrong                                                         |
+| --- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------- |
+| A1  | `globalStorageUri` for non-default profiles includes a `profiles/{hash}` path segment that can be parsed   | Pattern 4 (globalStorageUri parsing) | Profile column always null — acceptable per D-01 null-fallback design |
+| A2  | `vscode.env.appRoot` for SSH remote sessions follows `~/.vscode-server/bin/{40-hex}/resources/app` pattern | Pattern 3 (commit hash extraction)   | Commit hash extraction returns null; local_ide_path still populated   |
+| A3  | `prek` is installed on the developer machine                                                               | Environment Availability             | First commit fails git hook; need `prek install` first                |
+| A4  | VS Code 1.75+ is available on CI/test machines for @vscode/test-electron integration tests                 | Validation Architecture              | Integration tests cannot run; manual verification only                |
 
 **Assumptions A1 and A2 are designed to fail gracefully** — both return null and log via OutputChannel. The extension records null in the database rather than crashing. The CONTEXT.md D-01 decision explicitly requires empirical validation of A1 during Phase 1.
 
@@ -993,6 +1023,7 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 ## Sources
 
 ### Primary (HIGH confidence)
+
 - [STACK.md](./../research/STACK.md) — Locked schema, esbuild config, tsconfig, package.json manifest, @vscode/sqlite3 wrapper
 - [PITFALLS.md](./../research/PITFALLS.md) — 12 pitfalls; Pitfalls 1, 2, 4, 7, 8, 9, 11 directly relevant
 - [CONTEXT.md](./01-CONTEXT.md) — Locked decisions D-01 through D-06
@@ -1004,12 +1035,14 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 - npm registry — all package versions verified [VERIFIED]
 
 ### Secondary (MEDIUM confidence)
+
 - [github.com/microsoft/vscode/issues/160466](https://github.com/microsoft/vscode/issues/160466) — globalStorageUri doesn't respect active profile, closed not planned [VERIFIED status]
 - [github.com/microsoft/vscode/issues/211890](https://github.com/microsoft/vscode/issues/211890) — Profiles API closed out-of-scope; navigate-up workaround mentioned [VERIFIED status]
 - [github.com/microsoft/vscode/issues/102737](https://github.com/microsoft/vscode/issues/102737) — onDidCloseTextDocument fires on language change; doc.isClosed is false [VERIFIED]
 - vscode-server gist confirming `~/.vscode-server/bin/{git_cid}` installation path [MEDIUM — gist, not official docs]
 
 ### Tertiary (LOW confidence)
+
 - Profile hash path format `User/profiles/{hash}/` — confirmed by multiple sources including VS Code profile docs but exact behavior of globalStorageUri relative to profiles requires empirical testing [LOW for A1]
 
 ---
@@ -1017,6 +1050,7 @@ Not applicable — this is a greenfield phase with no existing runtime state. Th
 ## Metadata
 
 **Confidence breakdown:**
+
 - Standard stack: HIGH — all versions npm-verified; @vscode/sqlite3 is the only viable choice
 - Architecture: HIGH — locked by CONTEXT.md decisions; activation sequence well-documented
 - Pitfalls: HIGH — all sourced from documented issues or official docs

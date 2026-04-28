@@ -11,11 +11,11 @@
 
 ## Profile Detection
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Parse globalStorageUri | Extract profile ID from path segments (best-effort, null on failure) | ✓ |
-| Skip for Phase 1 | Record null now, revisit in v2 | |
-| Check process.env | Inspect for VSCODE_PROFILE or similar (fragile, undocumented) | |
+| Option                 | Description                                                          | Selected |
+| ---------------------- | -------------------------------------------------------------------- | -------- |
+| Parse globalStorageUri | Extract profile ID from path segments (best-effort, null on failure) | ✓        |
+| Skip for Phase 1       | Record null now, revisit in v2                                       |          |
+| Check process.env      | Inspect for VSCODE_PROFILE or similar (fragile, undocumented)        |          |
 
 **User's choice:** Parse globalStorageUri path segments
 **Notes:** Validates the workaround empirically during Phase 1 while VS Code's profile API situation (issue #177463) remains unresolved.
@@ -24,11 +24,11 @@
 
 ## Close Event False Positives
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Reconcile from textDocuments | Rebuild open_files from vscode.workspace.textDocuments on every event | ✓ |
-| Debounce + reconcile | Wait 100ms then rebuild (batches rapid events) | |
-| Accept false positives | Track events as-is, document as known behavior | |
+| Option                       | Description                                                           | Selected |
+| ---------------------------- | --------------------------------------------------------------------- | -------- |
+| Reconcile from textDocuments | Rebuild open_files from vscode.workspace.textDocuments on every event | ✓        |
+| Debounce + reconcile         | Wait 100ms then rebuild (batches rapid events)                        |          |
+| Accept false positives       | Track events as-is, document as known behavior                        |          |
 
 **User's choice:** Reconcile from `vscode.workspace.textDocuments` on every open/close event
 **Notes:** Eliminates language mode change false positives cleanly without debounce latency.
@@ -37,11 +37,11 @@
 
 ## Configuration Surface
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Minimal: enable + logLevel | thisCode.enable (boolean) + thisCode.logLevel (enum) | ✓ |
-| Standard: + dbPath | Above plus thisCode.dbPath for custom SQLite location | |
-| Full: + excludePatterns | Above plus glob array to skip tracking certain files | |
+| Option                     | Description                                           | Selected |
+| -------------------------- | ----------------------------------------------------- | -------- |
+| Minimal: enable + logLevel | thisCode.enable (boolean) + thisCode.logLevel (enum)  | ✓        |
+| Standard: + dbPath         | Above plus thisCode.dbPath for custom SQLite location |          |
+| Full: + excludePatterns    | Above plus glob array to skip tracking certain files  |          |
 
 **User's choice:** Minimal — `thisCode.enable` + `thisCode.logLevel` only
 **Notes:** No speculative settings. Additional config added when actually needed.
@@ -50,26 +50,26 @@
 
 ## Local Session JSON Path
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| ~/.this-code/sessions/{hash}.json | Consistent with this-code namespace, under same tree as SQLite DB | ✓ |
-| Workspace .vscode/ dir | {workspace}/.vscode/which-code-session.json | |
-| SQLite only for local | Skip per-instance JSON for local sessions entirely | |
+| Option                            | Description                                                       | Selected |
+| --------------------------------- | ----------------------------------------------------------------- | -------- |
+| ~/.this-code/sessions/{hash}.json | Consistent with this-code namespace, under same tree as SQLite DB | ✓        |
+| Workspace .vscode/ dir            | {workspace}/.vscode/this-code-session.json                        |          |
+| SQLite only for local             | Skip per-instance JSON for local sessions entirely                |          |
 
 **User's choice:** `~/.this-code/sessions/{hash}.json`
-**Notes:** User noted "not which-code.. this-code" — prompted the global path rename discussion below.
+**Notes:** User noted "not this-code.. this-code" — prompted the global path rename discussion below.
 
 ---
 
 ## Storage Path Rename (Global)
 
-| Option | Description | Selected |
-|--------|-------------|----------|
-| Rename all to ~/.this-code/ | Consistent with project rename — sessions.db, bin/, sessions/, env var guard | ✓ |
-| Keep ~/.which-code/ | Storage dir stays under original internal name | |
+| Option                      | Description                                                                  | Selected |
+| --------------------------- | ---------------------------------------------------------------------------- | -------- |
+| Rename all to ~/.this-code/ | Consistent with project rename — sessions.db, bin/, sessions/, env var guard | ✓        |
+| Keep ~/.this-code/          | Storage dir stays under original internal name                               |          |
 
-**User's choice:** Rename all `~/.which-code/` paths to `~/.this-code/` everywhere
-**Notes:** Affects all 4 phases. Planning docs (REQUIREMENTS.md, PROJECT.md, research files) still say `~/.which-code/` — CONTEXT.md D-06 is the authoritative correction for downstream agents.
+**User's choice:** Rename all `~/.this-code/` paths to `~/.this-code/` everywhere
+**Notes:** Affects all 4 phases. Planning docs (REQUIREMENTS.md, PROJECT.md, research files) still say `~/.this-code/` — CONTEXT.md D-06 is the authoritative correction for downstream agents.
 
 ---
 
