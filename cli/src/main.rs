@@ -2,6 +2,7 @@ mod cli;
 mod config;
 mod db;
 mod install;
+mod query;
 mod shim;
 
 use anyhow::Result;
@@ -38,6 +39,11 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Some(Commands::Query {
+            path,
+            dry_run,
+            json,
+        }) => query::run_query(&config, path, dry_run, json),
         Some(Commands::Install { fish }) => install::run_install(fish),
         None => {
             // Invoked as "this-code" with no subcommand: print help and exit 0.

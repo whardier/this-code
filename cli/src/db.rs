@@ -2,7 +2,6 @@ use anyhow::Result;
 use rusqlite::{Connection, OpenFlags, OptionalExtension as _};
 use std::path::Path;
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub(crate) struct Session {
     pub(crate) id: i64,
@@ -22,7 +21,6 @@ pub(crate) struct Session {
     pub(crate) open_files: String,
 }
 
-#[allow(dead_code)]
 pub(crate) fn open_db(path: &Path) -> Result<Connection> {
     let conn = Connection::open_with_flags(
         path,
@@ -35,11 +33,7 @@ pub(crate) fn open_db(path: &Path) -> Result<Connection> {
     Ok(conn)
 }
 
-#[allow(dead_code)]
-pub(crate) fn query_latest_session(
-    conn: &Connection,
-    workspace: &str,
-) -> Result<Option<Session>> {
+pub(crate) fn query_latest_session(conn: &Connection, workspace: &str) -> Result<Option<Session>> {
     conn.query_row(
         "SELECT id, invoked_at, workspace_path, user_data_dir, profile,
                 local_ide_path, remote_name, remote_server_path,

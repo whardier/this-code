@@ -16,6 +16,17 @@ pub(crate) struct Cli {
 /// Available subcommands.
 #[derive(Subcommand)]
 pub(crate) enum Commands {
+    /// Show the last-known session for a workspace path.
+    Query {
+        /// Workspace path to look up (default: current directory).
+        path: Option<std::path::PathBuf>,
+        /// Print what would be executed without running it.
+        #[arg(long)]
+        dry_run: bool,
+        /// Output as JSON instead of human-readable table.
+        #[arg(long)]
+        json: bool,
+    },
     /// Install this-code shell integration (bash/zsh env file + code symlink).
     Install {
         /// Also write ~/.config/fish/conf.d/this-code.fish (idempotent).

@@ -20,7 +20,6 @@ pub(crate) struct Config {
     ///
     /// Set via `THIS_CODE_DB_PATH` env var or `db_path` key in `~/.this-code/config.toml`.
     /// When `None`, defaults to `~/.this-code/sessions.db`.
-    #[allow(dead_code)]
     pub(crate) db_path: Option<PathBuf>,
 }
 

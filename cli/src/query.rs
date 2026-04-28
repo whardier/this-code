@@ -23,9 +23,10 @@ pub(crate) fn run_query(
 
     // D-04: resolve db_path from config or default
     let db_path = config.db_path.clone().unwrap_or_else(|| {
-        BaseDirs::new()
-            .map(|b| b.home_dir().join(".this-code/sessions.db"))
-            .unwrap_or_else(|| PathBuf::from(".this-code/sessions.db"))
+        BaseDirs::new().map_or_else(
+            || PathBuf::from(".this-code/sessions.db"),
+            |b| b.home_dir().join(".this-code/sessions.db"),
+        )
     });
     tracing::debug!(path = %db_path.display(), "resolved db_path");
 
@@ -77,7 +78,7 @@ pub(crate) fn run_query(
 fn format_human(session: &db::Session) {
     let open_files_count = serde_json::from_str::<serde_json::Value>(&session.open_files)
         .ok()
-        .and_then(|v| v.as_array().map(|a| a.len()))
+        .and_then(|v| v.as_array().map(Vec::len))
         .unwrap_or(0);
 
     println!("{:<14} {}", "workspace:", session.workspace_path);
@@ -153,15 +154,12 @@ mod tests {
             session.user_data_dir.as_deref(),
             Some("/home/user/.config/Code")
         );
-        assert_eq!(
-            session.server_commit_hash.as_deref(),
-            Some("abc123def456")
-        );
+        assert_eq!(session.server_commit_hash.as_deref(), Some("abc123def456"));
         assert_eq!(session.invoked_at, "2026-04-27T20:00:00.000");
         // Verify open_files count parsing
         let count = serde_json::from_str::<serde_json::Value>(&session.open_files)
             .ok()
-            .and_then(|v| v.as_array().map(|a| a.len()))
+            .and_then(|v| v.as_array().map(Vec::len))
             .unwrap_or(0);
         assert_eq!(count, 2);
     }
