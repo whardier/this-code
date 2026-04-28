@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Promoted 999.1 to Phase 4 (this-code which subcommand); Packaging bumped to Phase 5
-last_updated: "2026-04-28T10:00:00.000Z"
+status: planning
+stopped_at: Completed 03-02-PLAN.md — query command handler + CLI wiring
+last_updated: "2026-04-28T16:46:26.487Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 17
-  percent: 60
+  completed_phases: 4
+  total_plans: 18
+  completed_plans: 18
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-04-28
 
-Progress: [██████░░░░] 60%
+Progress: [██████████] 100%
 
 ## Phase 2 Wave Structure
 
@@ -137,6 +137,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Exit 0 for all no-sessions-found cases: absent DB, no-such-table, no matching row
 - [Phase ?]: session_to_json() builds serde_json::Value manually — avoids derive(Serialize) on Session, keeps struct off public serialization surface
 - [Phase ?]: map_or_else() over .map().unwrap_or_else() — clippy pedantic map_unwrap_or fires on the latter form
+- [Phase ?]: 04-01
+- [Phase ?]: 04-01 which subcommand
+- [Phase ?]: 04-01 which subcommand
 
 ### Pending Todos
 
@@ -149,6 +152,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T09:41:57.772Z
+Last session: 2026-04-28T16:45:48.067Z
 Stopped at: Completed 03-02-PLAN.md — query command handler + CLI wiring
 Resume file: None
