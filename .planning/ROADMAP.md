@@ -108,3 +108,14 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 2. Rust CLI + Shell Integration        | 6/6 | Complete   | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 2/2 | Complete   | 2026-04-28 |
 | 4. Packaging + Distribution            | 0/?            | Not started | -         |
+
+## Backlog
+
+### Phase 999.1: this-code which subcommand (BACKLOG)
+
+**Goal:** Add a `this-code which [PATH]` subcommand that prints the real `code` binary path (and matched workspace) for a given path, without displaying session data. Cleaner separation of concerns from `--dry-run` on `query` — `which` answers "what binary would launch?" while `query` answers "what session exists?".
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
