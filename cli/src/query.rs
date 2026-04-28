@@ -77,7 +77,7 @@ pub(crate) fn run_query(
 /// Walk up the directory tree from `start` until a session row is found or the
 /// filesystem root is reached. Returns `Ok(None)` when no ancestor matches.
 /// Propagates DB errors (including "no such table") to the caller.
-fn find_session_by_ancestry(
+pub(crate) fn find_session_by_ancestry(
     conn: &rusqlite::Connection,
     start: &std::path::Path,
 ) -> Result<Option<db::Session>> {
@@ -86,7 +86,7 @@ fn find_session_by_ancestry(
         let probe = search.to_string_lossy().into_owned();
         match db::query_latest_session(conn, &probe) {
             Ok(Some(s)) => return Ok(Some(s)),
-            Ok(None) => match search.parent().map(|p| p.to_path_buf()) {
+            Ok(None) => match search.parent().map(std::path::Path::to_path_buf) {
                 Some(parent) if parent != search => search = parent,
                 _ => return Ok(None),
             },

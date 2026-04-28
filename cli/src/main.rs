@@ -4,6 +4,7 @@ mod db;
 mod install;
 mod query;
 mod shim;
+mod which;
 
 use anyhow::Result;
 use clap::Parser as _;
@@ -44,6 +45,7 @@ fn main() -> Result<()> {
             dry_run,
             json,
         }) => query::run_query(&config, path, dry_run, json),
+        Some(Commands::Which { path, json }) => which::run_which(&config, path, json),
         Some(Commands::Install { fish }) => install::run_install(fish),
         None => {
             // Invoked as "this-code" with no subcommand: print help and exit 0.

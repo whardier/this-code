@@ -27,6 +27,14 @@ pub(crate) enum Commands {
         #[arg(long)]
         json: bool,
     },
+    /// Print the real `code` binary path (and matched workspace, if a session exists).
+    Which {
+        /// Workspace path to look up (default: current directory).
+        path: Option<std::path::PathBuf>,
+        /// Output as JSON instead of human-readable format.
+        #[arg(long)]
+        json: bool,
+    },
     /// Install this-code shell integration (bash/zsh env file + code symlink).
     Install {
         /// Also write ~/.config/fish/conf.d/this-code.fish (idempotent).
