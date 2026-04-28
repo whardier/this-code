@@ -18,8 +18,7 @@ pub(crate) fn run_query(
 
     // D-06: canonicalize with fallback
     let canonical = std::fs::canonicalize(&raw_path).unwrap_or_else(|_| raw_path.clone());
-    let workspace = canonical.to_string_lossy().into_owned();
-    tracing::debug!(%workspace, "query workspace");
+    tracing::debug!(path = %canonical.display(), "query path");
 
     // D-04: resolve db_path from config or default
     let db_path = config.db_path.clone().unwrap_or_else(|| {
@@ -37,7 +36,7 @@ pub(crate) fn run_query(
     }
 
     let conn = db::open_db(&db_path)?;
-    let session = match db::query_latest_session(&conn, &workspace) {
+    let session = match find_session_by_ancestry(&conn, &canonical) {
         Ok(s) => s,
         Err(e) => {
             // "no such table" means extension hasn't created the schema yet
@@ -61,7 +60,7 @@ pub(crate) fn run_query(
             .home_dir()
             .join(".this-code/bin");
         let real_code = shim::discover_real_code(config, &own_bin_dir)?;
-        println!("would exec: {} {}", real_code.display(), workspace);
+        println!("would exec: {} {}", real_code.display(), session.workspace_path);
         return Ok(());
     }
 
@@ -73,6 +72,27 @@ pub(crate) fn run_query(
     }
 
     Ok(())
+}
+
+/// Walk up the directory tree from `start` until a session row is found or the
+/// filesystem root is reached. Returns `Ok(None)` when no ancestor matches.
+/// Propagates DB errors (including "no such table") to the caller.
+fn find_session_by_ancestry(
+    conn: &rusqlite::Connection,
+    start: &std::path::Path,
+) -> Result<Option<db::Session>> {
+    let mut search = start.to_path_buf();
+    loop {
+        let probe = search.to_string_lossy().into_owned();
+        match db::query_latest_session(conn, &probe) {
+            Ok(Some(s)) => return Ok(Some(s)),
+            Ok(None) => match search.parent().map(|p| p.to_path_buf()) {
+                Some(parent) if parent != search => search = parent,
+                _ => return Ok(None),
+            },
+            Err(e) => return Err(e),
+        }
+    }
 }
 
 fn format_human(session: &db::Session) {
@@ -208,5 +228,66 @@ mod tests {
         let json_str = json_str.unwrap();
         assert!(json_str.contains("\"workspace_path\""));
         assert!(json_str.contains("\"invoked_at\""));
+    }
+
+    fn make_ancestry_db() -> rusqlite::Connection {
+        let conn = rusqlite::Connection::open_in_memory().expect("in-memory DB");
+        conn.execute_batch(
+            "PRAGMA busy_timeout=5000;
+             CREATE TABLE invocations (
+                 id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+                 invoked_at         TEXT    NOT NULL,
+                 workspace_path     TEXT,
+                 user_data_dir      TEXT,
+                 profile            TEXT,
+                 local_ide_path     TEXT    NOT NULL,
+                 remote_name        TEXT,
+                 remote_server_path TEXT,
+                 server_commit_hash TEXT,
+                 server_bin_path    TEXT,
+                 open_files         TEXT    NOT NULL DEFAULT '[]'
+             );",
+        )
+        .unwrap();
+        conn.execute(
+            "INSERT INTO invocations (invoked_at, workspace_path, local_ide_path, open_files)
+             VALUES (?1, ?2, ?3, ?4)",
+            rusqlite::params![
+                "2026-04-28T10:00:00.000",
+                "/home/user/project",
+                "/usr/bin/code",
+                "[]"
+            ],
+        )
+        .unwrap();
+        conn
+    }
+
+    #[test]
+    fn test_find_session_exact_match() {
+        let conn = make_ancestry_db();
+        let s = find_session_by_ancestry(&conn, std::path::Path::new("/home/user/project")).unwrap();
+        assert!(s.is_some());
+        assert_eq!(s.unwrap().workspace_path, "/home/user/project");
+    }
+
+    #[test]
+    fn test_find_session_walks_up_to_workspace() {
+        let conn = make_ancestry_db();
+        let s = find_session_by_ancestry(
+            &conn,
+            std::path::Path::new("/home/user/project/src/main.rs"),
+        )
+        .unwrap();
+        assert!(s.is_some());
+        assert_eq!(s.unwrap().workspace_path, "/home/user/project");
+    }
+
+    #[test]
+    fn test_find_session_unrelated_path_returns_none() {
+        let conn = make_ancestry_db();
+        let s =
+            find_session_by_ancestry(&conn, std::path::Path::new("/tmp/other/file")).unwrap();
+        assert!(s.is_none());
     }
 }
