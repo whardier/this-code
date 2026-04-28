@@ -15,6 +15,7 @@ Developers using VS Code remote development (SSH, Dev Containers) with multiple 
 - CLI-01 through CLI-06: `this-code` binary installs, provides `--help`/`--version`, installs shell integration, passes through via shim with recursion guard — validated Phase 2
 - SHELL-01 through SHELL-04: `this-code install [--fish]` creates env file (POSIX sh case-colon guard), code symlink, and fish conf.d file; instructions reference `~/.zshrc` — validated Phase 2
 - PLAT-02: macOS and Linux CI matrix with `fail-fast: false` — validated Phase 2
+- QUERY-01 through QUERY-04: `this-code query [PATH] [--dry-run] [--json]` reads `~/.this-code/sessions.db`, walks ancestry to find nearest workspace, formats human table or JSON output, shim remains pure pass-through — validated Phase 3
 
 ### Active
 
@@ -99,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-_Last updated: 2026-04-27 after Phase 2 completion — Rust CLI scaffold + shell integration delivered_
+_Last updated: 2026-04-28 after Phase 3 completion — session querying + ancestry walk delivered
