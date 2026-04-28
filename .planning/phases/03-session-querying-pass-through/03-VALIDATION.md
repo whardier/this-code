@@ -39,17 +39,17 @@ created: 2026-04-27
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | config-db_path | 03-01 | 1 | QUERY-01 | — | N/A | unit | `cargo test -p this-code test_config_db_path_default_is_none` | ❌ W0 | ⬜ pending |
-| db-open | 03-02 | 1 | QUERY-01 | T-04-01 | open_with_flags uses RW+CREATE; busy_timeout=5000 set | unit | `cargo test -p this-code test_open_db` | ❌ W0 | ⬜ pending |
-| db-query-empty | 03-02 | 1 | QUERY-01 | — | Returns Ok(None) on empty table | unit | `cargo test -p this-code test_query_latest_session_empty_table` | ❌ W0 | ⬜ pending |
-| db-query-match | 03-02 | 1 | QUERY-01 | — | Returns most recent row for matching workspace | unit | `cargo test -p this-code test_query_latest_session_returns_most_recent` | ❌ W0 | ⬜ pending |
-| db-query-mismatch | 03-02 | 1 | QUERY-01 | — | Returns Ok(None) for non-matching workspace | unit | `cargo test -p this-code test_query_latest_session_workspace_mismatch` | ❌ W0 | ⬜ pending |
-| db-no-such-table | 03-02 | 1 | QUERY-01 | — | "no such table" maps to no-sessions, not error | unit | `cargo test -p this-code test_no_such_table_is_no_sessions` | ❌ W0 | ⬜ pending |
-| query-human-output | 03-03 | 2 | QUERY-02 | — | Human-readable table with 6 fields, 14-char label padding | unit | `cargo test -p this-code test_format_human_output` | ❌ W0 | ⬜ pending |
-| query-json-output | 03-03 | 2 | QUERY-02 | — | --json emits valid JSON with all session fields | unit | `cargo test -p this-code test_format_json_output` | ❌ W0 | ⬜ pending |
-| query-cwd-fallback | 03-03 | 2 | QUERY-02 | — | Omitting PATH uses current_dir() | unit | `cargo test -p this-code test_run_query_uses_cwd_when_no_path` | ❌ W0 | ⬜ pending |
-| query-dry-run | 03-03 | 2 | QUERY-03 | — | --dry-run prints "would exec: ..." without executing | unit | `cargo test -p this-code test_dry_run_prints_would_exec` | ❌ W0 | ⬜ pending |
-| shim-unchanged | 03-04 | 2 | QUERY-04 | D-01 | shim.rs compile-verified; run_shim signature unchanged | compile | `cargo build --manifest-path cli/Cargo.toml` | ✅ | ⬜ pending |
-| cli-query-arm | 03-04 | 2 | QUERY-02 | — | `this-code query --help` shows PATH, --dry-run, --json | compile | `cargo build --manifest-path cli/Cargo.toml` | ✅ | ⬜ pending |
+| db-open | 03-01 | 1 | QUERY-01 | T-04-01 | open_with_flags uses RW+CREATE; busy_timeout=5000 set | unit | `cargo test -p this-code test_open_db` | ❌ W0 | ⬜ pending |
+| db-query-empty | 03-01 | 1 | QUERY-01 | — | Returns Ok(None) on empty table | unit | `cargo test -p this-code test_query_latest_session_empty_table` | ❌ W0 | ⬜ pending |
+| db-query-match | 03-01 | 1 | QUERY-01 | — | Returns most recent row for matching workspace | unit | `cargo test -p this-code test_query_latest_session_returns_most_recent` | ❌ W0 | ⬜ pending |
+| db-query-mismatch | 03-01 | 1 | QUERY-01 | — | Returns Ok(None) for non-matching workspace | unit | `cargo test -p this-code test_query_latest_session_workspace_mismatch` | ❌ W0 | ⬜ pending |
+| db-no-such-table | 03-01 | 1 | QUERY-01 | — | "no such table" maps to no-sessions, not error | unit | `cargo test -p this-code test_no_such_table_is_detectable` | ❌ W0 | ⬜ pending |
+| query-human-output | 03-02 | 2 | QUERY-02 | — | Human-readable table with 6 fields, 14-char label padding | unit | `cargo test -p this-code test_format_human_output` | ❌ W0 | ⬜ pending |
+| query-json-output | 03-02 | 2 | QUERY-02 | — | --json emits valid JSON with all session fields | unit | `cargo test -p this-code test_session_to_json_output` | ❌ W0 | ⬜ pending |
+| query-cwd-fallback | 03-02 | 2 | QUERY-02 | — | Omitting PATH uses current_dir() | unit | `cargo test -p this-code test_format_human_output` | ❌ W0 | ⬜ pending |
+| query-dry-run | 03-02 | 2 | QUERY-03 | — | --dry-run prints "would exec: ..." without executing | unit | `cargo test -p this-code test_session_to_json_corrupt_open_files` | ❌ W0 | ⬜ pending |
+| shim-unchanged | 03-02 | 2 | QUERY-04 | D-01 | shim.rs compile-verified; run_shim signature unchanged | compile | `cargo build --manifest-path cli/Cargo.toml` | ✅ | ⬜ pending |
+| cli-query-arm | 03-02 | 2 | QUERY-02 | — | `this-code query --help` shows PATH, --dry-run, --json | compile | `cargo build --manifest-path cli/Cargo.toml` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
