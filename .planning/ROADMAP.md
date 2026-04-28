@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Extension Core + Storage Foundation** - VS Code extension records session metadata to per-instance JSON and SQLite index (completed 2026-04-27)
 - [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
 - [x] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary (completed 2026-04-28)
-- [ ] **Phase 4: this-code which subcommand** - `this-code which [PATH]` prints the real `code` binary path and matched workspace for a given path
+- [x] **Phase 4: this-code which subcommand** - `this-code which [PATH]` prints the real `code` binary path and matched workspace for a given path (completed 2026-04-28)
 - [ ] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
 
 ## Phase Details
@@ -120,5 +120,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Extension Core + Storage Foundation | 9/9            | Complete    | 2026-04-27 |
 | 2. Rust CLI + Shell Integration        | 6/6            | Complete    | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 2/2            | Complete    | 2026-04-28 |
-| 4. this-code which subcommand          | 0/?            | Not started | -          |
+| 4. this-code which subcommand          | 1/1            | Complete    | 2026-04-28 |
 | 5. Packaging + Distribution            | 0/?            | Not started | -          |

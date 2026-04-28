@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 03-02-PLAN.md — query command handler + CLI wiring
-last_updated: "2026-04-28T16:46:26.487Z"
+status: ready_to_plan
+stopped_at: Completed 04-01-PLAN.md — this-code which subcommand
+last_updated: "2026-04-28T17:00:00.000Z"
 last_activity: 2026-04-28
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 18
   completed_plans: 18
-  percent: 100
+  percent: 80
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 ## Current Position
 
-Phase: 04
+Phase: 05
 Plan: Not started
 Status: Ready to plan
 Last activity: 2026-04-28
 
-Progress: [██████████] 100%
+Progress: [████████░░] 80%
 
 ## Phase 2 Wave Structure
 
@@ -137,9 +137,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Exit 0 for all no-sessions-found cases: absent DB, no-such-table, no matching row
 - [Phase ?]: session_to_json() builds serde_json::Value manually — avoids derive(Serialize) on Session, keeps struct off public serialization surface
 - [Phase ?]: map_or_else() over .map().unwrap_or_else() — clippy pedantic map_unwrap_or fires on the latter form
-- [Phase ?]: 04-01
-- [Phase ?]: 04-01 which subcommand
-- [Phase ?]: 04-01 which subcommand
+- [Phase 04]: lookup_workspace() swallows DB errors at tracing::debug level — which is a convenience command; binary discovery is primary contract, session lookup is optional
+- [Phase 04]: find_session_by_ancestry promoted to pub(crate) in query.rs — shared by both query and which subcommands
+- [Phase 04]: which output: binary always printed; workspace line only appears when session found — no "no sessions found" message
 
 ### Pending Todos
 
