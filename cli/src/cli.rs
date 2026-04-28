@@ -20,9 +20,6 @@ pub(crate) enum Commands {
     Query {
         /// Workspace path to look up (default: current directory).
         path: Option<std::path::PathBuf>,
-        /// Print what would be executed without running it.
-        #[arg(long)]
-        dry_run: bool,
         /// Output as JSON instead of human-readable table.
         #[arg(long)]
         json: bool,

@@ -1,15 +1,10 @@
-use crate::{config::Config, db, shim};
+use crate::{config::Config, db};
 use anyhow::Result;
 use directories::BaseDirs;
 use serde_json::json;
 use std::path::PathBuf;
 
-pub(crate) fn run_query(
-    config: &Config,
-    path: Option<PathBuf>,
-    dry_run: bool,
-    json: bool,
-) -> Result<()> {
+pub(crate) fn run_query(config: &Config, path: Option<PathBuf>, json: bool) -> Result<()> {
     // Resolve query path: provided arg or cwd (per D-05)
     let raw_path = match path {
         Some(p) => p,
@@ -52,17 +47,6 @@ pub(crate) fn run_query(
         println!("no sessions found");
         return Ok(());
     };
-
-    // D-09: dry-run prints what would be exec'd without executing
-    if dry_run {
-        let own_bin_dir = BaseDirs::new()
-            .ok_or_else(|| anyhow::anyhow!("Cannot determine home directory"))?
-            .home_dir()
-            .join(".this-code/bin");
-        let real_code = shim::discover_real_code(config, &own_bin_dir)?;
-        println!("would exec: {} {}", real_code.display(), session.workspace_path);
-        return Ok(());
-    }
 
     if json {
         let value = session_to_json(&session);

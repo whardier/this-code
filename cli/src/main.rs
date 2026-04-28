@@ -40,11 +40,7 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Query {
-            path,
-            dry_run,
-            json,
-        }) => query::run_query(&config, path, dry_run, json),
+        Some(Commands::Query { path, json }) => query::run_query(&config, path, json),
         Some(Commands::Which { path, json }) => which::run_which(&config, path, json),
         Some(Commands::Install { fish }) => install::run_install(fish),
         None => {
