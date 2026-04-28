@@ -14,9 +14,14 @@ pub(crate) struct Config {
     ///
     /// Set via `THIS_CODE_CODE_PATH` env var or `code_path` key in `~/.this-code/config.toml`.
     /// When `None`, the shim auto-discovers via PATH stripping + `which`.
-    // Field is read in Plans 02-04 (shim exec) and 02-05 (install); allow until then.
-    #[allow(dead_code)]
     pub(crate) code_path: Option<PathBuf>,
+
+    /// Explicit path to the sessions `SQLite` database.
+    ///
+    /// Set via `THIS_CODE_DB_PATH` env var or `db_path` key in `~/.this-code/config.toml`.
+    /// When `None`, defaults to `~/.this-code/sessions.db`.
+    #[allow(dead_code)]
+    pub(crate) db_path: Option<PathBuf>,
 }
 
 /// Load configuration from `~/.this-code/config.toml` and `THIS_CODE_*` env vars.
@@ -60,5 +65,6 @@ mod tests {
     fn test_config_default_is_all_none() {
         let config = Config::default();
         assert!(config.code_path.is_none());
+        assert!(config.db_path.is_none());
     }
 }
