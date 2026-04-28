@@ -163,7 +163,7 @@ cli/src/
 ## Specific Implementation Notes
 
 - `open_db()` in `db.rs`: use `rusqlite::Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE)`. Set `PRAGMA busy_timeout = 5000` immediately after open. If the file does not exist but `CREATE` flag is set, rusqlite creates an empty DB — in that case `query_latest_session()` gets "no such table" on the first query, which should be caught and treated as "no sessions found" (same as absent DB).
-- `query_latest_session()`: `SELECT ... FROM sessions WHERE workspace_path = ?1 ORDER BY invoked_at DESC LIMIT 1`. Use parameterized query, not string interpolation.
+- `query_latest_session()`: `SELECT ... FROM invocations WHERE workspace_path = ?1 ORDER BY invoked_at DESC LIMIT 1`. Use parameterized query, not string interpolation. **CRITICAL**: Table name is `invocations`, NOT `sessions` — the file is `sessions.db` but the table inside is `invocations` (confirmed in `extension/src/db.ts` line 74).
 - `db_path` resolution: `config.db_path.clone().unwrap_or_else(|| BaseDirs::new()?.home_dir().join(".this-code/sessions.db"))`. Match the pattern already used in `config.rs` and `install.rs`.
 - `--json` serialization: use `serde_json::to_string_pretty(&session_as_value)` where `session_as_value` is a `serde_json::Value` built from the `Session` fields. No need to `#[derive(Serialize)]` on `Session` — a manual `Value` map avoids leaking internal struct to the serialization surface.
 
