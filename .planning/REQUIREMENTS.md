@@ -62,7 +62,7 @@
 
 ### Session Querying
 
-- [ ] **QUERY-01**: CLI reads session state from text files in `~/.vscode-server/bin/*/` and/or `~/.this-code/sessions.db`
+- [x] **QUERY-01**: CLI reads session state from text files in `~/.vscode-server/bin/*/` and/or `~/.this-code/sessions.db`
 - [ ] **QUERY-02**: CLI supports `this-code query [path]` to show last-known session for a given directory
 - [ ] **QUERY-03**: CLI supports `--dry-run` flag to print what it would do instead of executing
 - [ ] **QUERY-04**: v1 default behavior is pass-through only — CLI captures context and calls real `code` with original args (routing logic is v2)
@@ -137,7 +137,7 @@
 | SHELL-02    | Phase 2 | Complete |
 | SHELL-03    | Phase 2 | Complete |
 | SHELL-04    | Phase 2 | Complete |
-| QUERY-01    | Phase 3 | Pending |
+| QUERY-01    | Phase 3 | Complete |
 | QUERY-02    | Phase 3 | Pending |
 | QUERY-03    | Phase 3 | Pending |
 | QUERY-04    | Phase 3 | Pending |

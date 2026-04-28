@@ -82,7 +82,7 @@ Plans:
 
 Plans:
 
-- [ ] 03-01-PLAN.md — Data layer: db.rs (Session struct, open_db, query_latest_session) + config.rs db_path field (QUERY-01)
+- [x] 03-01-PLAN.md — Data layer: db.rs (Session struct, open_db, query_latest_session) + config.rs db_path field (QUERY-01)
 - [ ] 03-02-PLAN.md — Query command: query.rs handler, cli.rs Query variant, main.rs wiring (QUERY-02, QUERY-03, QUERY-04)
 
 ### Phase 4: Packaging + Distribution
@@ -106,5 +106,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | -------------------------------------- | -------------- | ----------- | --------- |
 | 1. Extension Core + Storage Foundation | 0/7            | Planned     | -         |
 | 2. Rust CLI + Shell Integration        | 6/6 | Complete   | 2026-04-27 |
-| 3. Session Querying + Pass-Through     | 0/2            | Planned     | -         |
+| 3. Session Querying + Pass-Through     | 1/2 | In Progress|  |
 | 4. Packaging + Distribution            | 0/?            | Not started | -         |

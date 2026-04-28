@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Completed 02-06-PLAN.md — Rust CLI GitHub Actions CI
-last_updated: "2026-04-27T20:24:28.938Z"
-last_activity: 2026-04-27
+status: executing
+stopped_at: Completed 03-01-PLAN.md — db.rs data access layer + config db_path
+last_updated: "2026-04-28T09:36:11.161Z"
+last_activity: 2026-04-28
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
-  percent: 75
+  completed_phases: 2
+  total_plans: 17
+  completed_plans: 16
+  percent: 94
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Developers using VS Code remote development with multiple profiles never have to think about which instance or --user-data-dir to use -- this-code remembers and routes automatically.
-**Current focus:** Phase 02 — rust-cli-shell-integration
+**Current focus:** Phase 3 — session-querying-pass-through
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: Ready to plan
+Phase: 3 (session-querying-pass-through) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-04-28
 
-Progress: [██████████] 100%
+Progress: [█████████░] 94%
 
 ## Phase 2 Wave Structure
 
@@ -74,6 +74,7 @@ _Updated after each plan completion_
 | Phase 02-rust-cli-shell-integration P04 | 2min | 2 tasks | 2 files |
 | Phase 02-rust-cli-shell-integration P05 | 3min | 2 tasks | 2 files |
 | Phase 02-rust-cli-shell-integration P06 | 1min | 1 tasks | 1 files |
+| Phase 03-session-querying-pass-through P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Recent decisions affecting current work:
 - [Phase 02-05]: Relative symlink target "this-code" — both code and this-code live in same bin dir; robust to home dir moves
 - [Phase 02-05]: symlink_metadata().is_ok() for idempotency — exists() returns false for broken symlinks; symlink_metadata() returns Ok for both live and broken
 - [Phase ?]: GitHub Actions CI matrix on ubuntu-latest and macos-latest with fail-fast: false — both platforms verified independently on every push
+- [Phase ?]: #[allow(dead_code)] on Session/open_db/query_latest_session — consumed by query.rs Plan 02; remove then
+- [Phase ?]: db_path: Option<PathBuf> on Config — THIS_CODE_DB_PATH env var supported via Env::prefixed without .split
+- [Phase ?]: clippy doc_markdown: SQLite in doc comments must be backtick-quoted
 
 ### Pending Todos
 
@@ -139,6 +143,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-27T20:24:28.928Z
-Stopped at: Completed 02-06-PLAN.md — Rust CLI GitHub Actions CI
+Last session: 2026-04-28T09:36:11.151Z
+Stopped at: Completed 03-01-PLAN.md — db.rs data access layer + config db_path
 Resume file: None
