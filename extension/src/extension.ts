@@ -39,6 +39,12 @@ export async function activate(
     return;
   }
 
+  // Fire-and-forget outside initialization try/catch — CLI check always runs
+  // even if DB/session setup fails. Errors logged, never thrown to caller (D-04).
+  checkCliPresence().catch((err) => {
+    log("info", `CLI presence check error: ${(err as Error).message}`);
+  });
+
   try {
     const thisCodeDir = path.join(os.homedir(), ".this-code");
     await fs.mkdir(thisCodeDir, { recursive: true });
@@ -114,9 +120,6 @@ export async function activate(
     scanExistingRemoteSessions(db).catch((err) => {
       log("info", `Startup scan error: ${(err as Error).message}`);
     });
-
-    // Fire-and-forget — do NOT await (D-04: non-blocking, never delays session recording)
-    checkCliPresence().catch(() => {});
 
     log(
       "info",

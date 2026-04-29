@@ -19,7 +19,7 @@ export async function checkCliPresence(cliPath: string = DEFAULT_CLI_PATH): Prom
     await fs.access(cliPath);
   } catch {
     const action = await vscode.window.showInformationMessage(
-      "This Code: CLI not found at ~/.this-code/bin/this-code",
+      `This Code: CLI not found at ${cliPath}`,
       "Download",
     );
     if (action === "Download") {
