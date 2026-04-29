@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 5 planned — 3 plans in 1 wave
-last_updated: "2026-04-29T00:00:00.000Z"
+status: executing
+stopped_at: Completed 05-01-PLAN.md — CLI detection module
+last_updated: "2026-04-29T20:01:06.896Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 21
-  completed_plans: 18
-  percent: 86
+  completed_plans: 19
+  percent: 90
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Developers using VS Code remote development with multiple profiles never have to think about which instance or --user-data-dir to use -- this-code remembers and routes automatically.
-**Current focus:** Phase 5 — Packaging + Distribution
+**Current focus:** Phase 05 — packaging-distribution
 
 ## Current Position
 
-Phase: 05
-Plan: Ready to execute (3 plans, 1 wave)
+Phase: 05 (packaging-distribution) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
 Last activity: 2026-04-29
 
-Progress: [████████░░] 86%
+Progress: [█████████░] 90%
 
 ## Phase 2 Wave Structure
 
@@ -140,6 +140,9 @@ Recent decisions affecting current work:
 - [Phase 04]: lookup_workspace() swallows DB errors at tracing::debug level — which is a convenience command; binary discovery is primary contract, session lookup is optional
 - [Phase 04]: find_session_by_ancestry promoted to pub(crate) in query.rs — shared by both query and which subcommands
 - [Phase 04]: which output: binary always printed; workspace line only appears when session found — no "no sessions found" message
+- [Phase ?]: EXPECTED_CLI_MAJOR=0 hardcoded constant in cliDetect.ts — simplest approach, no runtime package.json parsing
+- [Phase ?]: checkCliPresence accepts optional cliPath for testability — mirrors scanExistingRemoteSessions(db, binDir?) pattern from storage.ts
+- [Phase ?]: execFile timeout=3000ms in checkCliPresence — prevents CLI version check from hanging extension activation (Pitfall 5 mitigation)
 
 ### Pending Todos
 
@@ -152,6 +155,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T16:45:48.067Z
-Stopped at: Completed 03-02-PLAN.md — query command handler + CLI wiring
+Last session: 2026-04-29T20:01:06.884Z
+Stopped at: Completed 05-01-PLAN.md — CLI detection module
 Resume file: None

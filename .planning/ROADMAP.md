@@ -113,7 +113,7 @@ Plans:
 
 Plans:
 
-- [ ] 05-01-PLAN.md — CLI detection module + extension integration + PKG-03 tests (PKG-03)
+- [x] 05-01-PLAN.md — CLI detection module + extension integration + PKG-03 tests (PKG-03)
 - [ ] 05-02-PLAN.md — CI Xvfb integration tests in ci.yml (PKG-04)
 - [ ] 05-03-PLAN.md — Extension + CLI release workflows with 4-platform matrix (PKG-01, PKG-02, PKG-04)
 
@@ -128,4 +128,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Rust CLI + Shell Integration        | 6/6            | Complete    | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 2/2            | Complete    | 2026-04-28 |
 | 4. this-code which subcommand          | 1/1            | Complete    | 2026-04-28 |
-| 5. Packaging + Distribution            | 0/3            | Planning    | -          |
+| 5. Packaging + Distribution            | 1/3 | In Progress|  |
