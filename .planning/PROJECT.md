@@ -17,20 +17,24 @@ Developers using VS Code remote development (SSH, Dev Containers) with multiple 
 - PLAT-02: macOS and Linux CI matrix with `fail-fast: false` — validated Phase 2
 - QUERY-01 through QUERY-04: `this-code query [PATH] [--dry-run] [--json]` reads `~/.this-code/sessions.db`, walks ancestry to find nearest workspace, formats human table or JSON output, shim remains pure pass-through — validated Phase 3
 
+### Validated
+
+- CLI-01 through CLI-06: `this-code` binary installs, provides `--help`/`--version`, installs shell integration, passes through via shim with recursion guard — validated Phase 2
+- SHELL-01 through SHELL-04: `this-code install [--fish]` creates env file (POSIX sh case-colon guard), code symlink, and fish conf.d file; instructions reference `~/.zshrc` — validated Phase 2
+- PLAT-02: macOS and Linux CI matrix with `fail-fast: false` — validated Phase 2
+- QUERY-01 through QUERY-04: `this-code query [PATH] [--dry-run] [--json]` reads `~/.this-code/sessions.db`, walks ancestry to find nearest workspace, formats human table or JSON output, shim remains pure pass-through — validated Phase 3
+- EXT-01 through EXT-07, STOR-01 through STOR-04, TRACK-01 through TRACK-05: extension writes per-instance JSON + SQLite index, tracks file open/close events, runs as workspace extension — validated Phase 1
+- PKG-01: 4-platform VSIX build matrix (linux-x64, linux-arm64, darwin-arm64, darwin-x64) via `ext-release.yml` — validated Phase 5
+- PKG-02: native runners in release CI — validated Phase 5
+- PKG-03: extension detects CLI at `~/.this-code/bin/this-code` on activation; shows info notification with Download button if missing; shows warning on major version mismatch — validated Phase 5
+- PKG-04: VS Code integration tests run on every push/PR; Xvfb on Linux, direct on macOS — validated Phase 5
+
 ### Active
 
 See `.planning/REQUIREMENTS.md` for the full v1 requirement list (35 requirements across EXT, STOR, TRACK, CLI, SHELL, QUERY, PKG, PLAT categories).
 
-Key active requirements:
-
-- [ ] Extension (`whardier.this-code`) writes per-instance session state to `~/.vscode-server/bin/{hash}/this-code-session.json`
-- [ ] Extension maintains SQLite index at `~/.this-code/sessions.db` (WAL mode)
-- [ ] Extension runs with `extensionKind: ["workspace"]` — tracks files on the machine they live on
-- [ ] Extension tracks file open/close events, workspace root, server commit hash, --user-data-dir, --profile
-- [ ] Extension has no UI — config-only with Output Channel
-- [ ] CLI (`this-code`) intercepts `code` command, self-detects recursion, passes through in v1
-- [ ] CLI provides shell integration (bash/zsh/fish) via `this-code init <shell>`
-- [ ] CLI bundles inside VSIX; 4-platform VSIX builds for Marketplace
+Key open items (human UAT pending):
+- Release workflow end-to-end (`ext/v*` and `cli/v*` tags) — deferred, test manually on first release
 
 ### Out of Scope
 
@@ -100,4 +104,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-_Last updated: 2026-04-28 after Phase 3 completion — session querying + ancestry walk delivered
+_Last updated: 2026-04-29 after Phase 5 completion — packaging + distribution complete; all PKG requirements validated; v1.0 milestone deliverables done_
