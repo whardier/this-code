@@ -72,7 +72,7 @@
 - [ ] **PKG-01**: Extension is published to the VS Code Marketplace as `whardier.this-code`
 - [ ] **PKG-02**: VSIX packages are built per-platform: `darwin-arm64`, `darwin-x64`, `linux-x64`, `linux-arm64` (via `vsce package --target`)
 - [x] **PKG-03**: Rust CLI binary is bundled inside the VSIX for convenience (one per platform target)
-- [ ] **PKG-04**: GitHub Actions CI matrix builds all 4 platform VSIX packages on release
+- [x] **PKG-04**: GitHub Actions CI matrix builds all 4 platform VSIX packages on release
 
 ### Platform
 
@@ -144,7 +144,7 @@
 | PKG-01      | Phase 4 | Pending |
 | PKG-02      | Phase 4 | Pending |
 | PKG-03      | Phase 4 | Complete |
-| PKG-04      | Phase 4 | Pending |
+| PKG-04      | Phase 4 | Complete |
 | PLAT-01     | Phase 1 | Pending |
 | PLAT-02     | Phase 2 | Complete |
 
