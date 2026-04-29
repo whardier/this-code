@@ -38,6 +38,16 @@ jobs:
         working-directory: extension
         run: npm run build
 
+      - name: Run integration tests (Linux)
+        if: runner.os == 'Linux'
+        working-directory: extension
+        run: xvfb-run -a npm test
+
+      - name: Run integration tests (macOS)
+        if: runner.os != 'Linux'
+        working-directory: extension
+        run: npm test
+
       - name: Verify manifest
         working-directory: extension
         run: |
@@ -65,8 +75,3 @@ jobs:
             exit 1
           fi
           echo "TRACK-05 OK: no onDidSaveTextDocument"
-
-# Note: Full integration tests (npm run test via @vscode/test-electron) require
-# Xvfb on Linux (virtual framebuffer) and a real GUI session. That setup is
-# deferred to Phase 4 (Marketplace packaging). Phase 1 CI validates:
-# typecheck, build, manifest checks, and static source assertions.
