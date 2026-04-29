@@ -1,0 +1,80 @@
+name: CLI Release
+
+on:
+  push:
+    tags:
+      - 'cli/v*'
+
+jobs:
+  build-cli:
+    name: Build CLI (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+          - os: ubuntu-24.04-arm
+            target: linux-arm64
+          - os: macos-latest
+            target: darwin-arm64
+          - os: macos-15-large
+            target: darwin-x64
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            cli/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('cli/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build release binary
+        working-directory: cli
+        run: cargo build --release
+
+      - name: Strip binary
+        working-directory: cli
+        run: strip target/release/this-code
+
+      - name: Rename binary with platform suffix
+        working-directory: cli
+        run: cp target/release/this-code this-code-${{ matrix.target }}
+
+      - name: Upload CLI binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.target }}
+          path: cli/this-code-${{ matrix.target }}
+
+  release-cli:
+    name: Create CLI GitHub Release
+    needs: [build-cli]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all CLI binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cli-*
+          merge-multiple: true
+          path: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/this-code-*
+          name: CLI ${{ github.ref_name }}
