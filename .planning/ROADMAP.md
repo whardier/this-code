@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
 - [x] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary (completed 2026-04-28)
 - [x] **Phase 4: this-code which subcommand** - `this-code which [PATH]` prints the real `code` binary path and matched workspace for a given path (completed 2026-04-28)
-- [ ] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds with bundled CLI, CI matrix, Marketplace publish
+- [ ] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds, CLI detection, CI integration tests, release workflows
 
 ## Phase Details
 
@@ -100,15 +100,22 @@ Plans:
 
 ### Phase 5: Packaging + Distribution
 
-**Goal**: Users can install This Code from the VS Code Marketplace or GitHub Releases on any supported platform
+**Goal**: Extension detects CLI presence and notifies users, CI runs integration tests, release workflows build platform-specific VSIXes and CLI binaries on 4 native runners
 **Depends on**: Phase 4
 **Requirements**: PKG-01, PKG-02, PKG-03, PKG-04
 **Success Criteria** (what must be TRUE):
 
-1. Running `vsce package --target darwin-arm64` (and the other 3 targets) produces a valid VSIX file containing the correct native SQLite binary and Rust CLI binary for that platform
-2. A GitHub Actions workflow builds all 4 platform VSIX packages on a tagged release without manual intervention
-3. The extension is installable from the VS Code Marketplace as `whardier.this-code` and activates correctly on the target platform
-   **Plans**: TBD
+1. Extension activation checks for `~/.this-code/bin/this-code` and shows a notification if missing or version-incompatible
+2. A GitHub Actions workflow builds all 4 platform VSIX packages on a tagged `ext/v*` release without manual intervention
+3. A GitHub Actions workflow builds all 4 platform CLI binaries on a tagged `cli/v*` release
+4. VS Code integration tests run in CI on every push via Xvfb on Linux
+   **Plans**: 3 plans
+
+Plans:
+
+- [ ] 05-01-PLAN.md — CLI detection module + extension integration + PKG-03 tests (PKG-03)
+- [ ] 05-02-PLAN.md — CI Xvfb integration tests in ci.yml (PKG-04)
+- [ ] 05-03-PLAN.md — Extension + CLI release workflows with 4-platform matrix (PKG-01, PKG-02, PKG-04)
 
 ## Progress
 
@@ -121,4 +128,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Rust CLI + Shell Integration        | 6/6            | Complete    | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 2/2            | Complete    | 2026-04-28 |
 | 4. this-code which subcommand          | 1/1            | Complete    | 2026-04-28 |
-| 5. Packaging + Distribution            | 0/?            | Not started | -          |
+| 5. Packaging + Distribution            | 0/3            | Planning    | -          |
