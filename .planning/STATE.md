@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 05-01-PLAN.md — CLI detection module
-last_updated: "2026-04-29T20:03:53.370Z"
+status: verifying
+stopped_at: Completed 05-03-PLAN.md — release workflows and RELEASE.md
+last_updated: "2026-04-29T20:08:05.049Z"
 last_activity: 2026-04-29
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 21
-  completed_plans: 20
-  percent: 95
+  completed_plans: 21
+  percent: 100
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-04-25)
 
 Phase: 05 (packaging-distribution) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-29
 
-Progress: [██████████] 95%
+Progress: [██████████] 100%
 
 ## Phase 2 Wave Structure
 
@@ -145,6 +145,8 @@ Recent decisions affecting current work:
 - [Phase ?]: checkCliPresence accepts optional cliPath for testability — mirrors scanExistingRemoteSessions(db, binDir?) pattern from storage.ts
 - [Phase ?]: execFile timeout=3000ms in checkCliPresence — prevents CLI version check from hanging extension activation (Pitfall 5 mitigation)
 - [Phase ?]: Xvfb integration test pattern
+- [Phase ?]: macos-15-large chosen over deprecated macos-13 for darwin-x64 native runner in both release workflows
+- [Phase ?]: No vsce publish step in release workflows — D-10 mandates manual Marketplace publish for Phase 5
 
 ### Pending Todos
 
@@ -157,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T20:03:24.147Z
-Stopped at: Completed 05-01-PLAN.md — CLI detection module
+Last session: 2026-04-29T20:08:05.040Z
+Stopped at: Completed 05-03-PLAN.md — release workflows and RELEASE.md
 Resume file: None

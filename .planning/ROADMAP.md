@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Rust CLI + Shell Integration** - CLI binary reads session database, shell scripts prepend it to PATH (completed 2026-04-27)
 - [x] **Phase 3: Session Querying + Pass-Through** - CLI queries session state and passes through to real code binary (completed 2026-04-28)
 - [x] **Phase 4: this-code which subcommand** - `this-code which [PATH]` prints the real `code` binary path and matched workspace for a given path (completed 2026-04-28)
-- [ ] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds, CLI detection, CI integration tests, release workflows
+- [x] **Phase 5: Packaging + Distribution** - Platform-specific VSIX builds, CLI detection, CI integration tests, release workflows (completed 2026-04-29)
 
 ## Phase Details
 
@@ -115,7 +115,7 @@ Plans:
 
 - [x] 05-01-PLAN.md — CLI detection module + extension integration + PKG-03 tests (PKG-03)
 - [x] 05-02-PLAN.md — CI Xvfb integration tests in ci.yml (PKG-04)
-- [ ] 05-03-PLAN.md — Extension + CLI release workflows with 4-platform matrix (PKG-01, PKG-02, PKG-04)
+- [x] 05-03-PLAN.md — Extension + CLI release workflows with 4-platform matrix (PKG-01, PKG-02, PKG-04)
 
 ## Progress
 
@@ -128,4 +128,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Rust CLI + Shell Integration        | 6/6            | Complete    | 2026-04-27 |
 | 3. Session Querying + Pass-Through     | 2/2            | Complete    | 2026-04-28 |
 | 4. this-code which subcommand          | 1/1            | Complete    | 2026-04-28 |
-| 5. Packaging + Distribution            | 2/3 | In Progress|  |
+| 5. Packaging + Distribution            | 3/3 | Complete   | 2026-04-29 |
