@@ -6,6 +6,7 @@ import { Database, initDatabase } from "./db";
 import { collectSessionMetadata, getSessionJsonPath } from "./session";
 import { writeSessionJson, scanExistingRemoteSessions } from "./storage";
 import { isEnabled, getLogLevel } from "./config";
+import { checkCliPresence } from "./cliDetect";
 
 let db: Database | undefined;
 let outputChannel: vscode.OutputChannel | undefined;
@@ -113,6 +114,9 @@ export async function activate(
     scanExistingRemoteSessions(db).catch((err) => {
       log("info", `Startup scan error: ${(err as Error).message}`);
     });
+
+    // Fire-and-forget — do NOT await (D-04: non-blocking, never delays session recording)
+    checkCliPresence().catch(() => {});
 
     log(
       "info",
