@@ -748,22 +748,22 @@ npx @vscode/vsce publish --pre-release \
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **macos-13 replacement for darwin-x64**
    - What we know: `macos-13` is deprecated. `macos-15-intel` is the current Intel x64 standard runner; `macos-15-large` is a larger runner.
    - What's unclear: Whether `macos-15-intel` is free for public repos at standard tier, or requires paid plan. The GitHub docs page said macOS standard runners are free for public repos, which would include `macos-15-intel`.
-   - Recommendation: **Use `macos-15-large` in CONTEXT.md but flag in the plan that `macos-15-intel` may be the correct free-tier label.** The planner should document this as a one-line change at workflow creation time.
+   - RESOLVED: Use `macos-15-large` for darwin-x64. Flag in plan as a one-line change point if `macos-15-intel` turns out to be the correct free-tier label. Plans implement `macos-15-large`.
 
 2. **`.vscodeignore` dev dependency exclusion during release build**
    - What we know: `vsce package` respects `.vscodeignore`. Current file excludes `node_modules/**` with exception for `@vscode/sqlite3`.
    - What's unclear: Whether `npm ci` (full install, including devDeps) or `npm ci --omit=dev` should be used before packaging. vsce handles node_modules exclusion itself via `.vscodeignore`, so full `npm ci` is fine.
-   - Recommendation: Use full `npm ci` (not `--omit=dev`) because the build step needs TypeScript and esbuild. The `.vscodeignore` already excludes all other `node_modules`.
+   - RESOLVED: Use full `npm ci` (not `--omit=dev`) because the build step needs TypeScript and esbuild. The `.vscodeignore` already excludes all other `node_modules`. Plans implement full `npm ci`.
 
 3. **Pre-release engines version requirement**
    - What we know: Pre-release extensions need `engines.vscode >= 1.63.0`. Current package.json has `"vscode": "^1.75.0"` which satisfies this.
    - What's unclear: Nothing — `^1.75.0` > `1.63.0`, requirement is met automatically.
-   - Recommendation: No change needed.
+   - RESOLVED: No change needed. `engines.vscode: "^1.75.0"` already satisfies the pre-release requirement.
 
 ---
 

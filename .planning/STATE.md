@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 03-02-PLAN.md — query command handler + CLI wiring
-last_updated: "2026-04-29T05:18:53.259Z"
-last_activity: 2026-04-28
+stopped_at: Phase 5 planned — 3 plans in 1 wave
+last_updated: "2026-04-29T00:00:00.000Z"
+last_activity: 2026-04-29
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 18
+  total_plans: 21
   completed_plans: 18
-  percent: 100
+  percent: 86
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-25)
 
 **Core value:** Developers using VS Code remote development with multiple profiles never have to think about which instance or --user-data-dir to use -- this-code remembers and routes automatically.
-**Current focus:** Phase 4 — this-code-which-subcommand
+**Current focus:** Phase 5 — Packaging + Distribution
 
 ## Current Position
 
 Phase: 05
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-28
+Plan: Ready to execute (3 plans, 1 wave)
+Status: Ready to execute
+Last activity: 2026-04-29
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 86%
 
 ## Phase 2 Wave Structure
 
