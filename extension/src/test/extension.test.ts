@@ -595,6 +595,103 @@ suite("SESSION-HELPERS: extractCommitHash via getSessionJsonPath", () => {
   });
 });
 
+suite("PKG-03: CLI detection module", () => {
+  test("cliDetect.ts exports checkCliPresence function", () => {
+    const { checkCliPresence } = require("../cliDetect");
+    assert.strictEqual(typeof checkCliPresence, "function");
+  });
+
+  test("checkCliPresence accepts optional cliPath parameter", () => {
+    const { checkCliPresence } = require("../cliDetect");
+    // Function.length reflects required params only; optional params don't count
+    // But calling with a string argument must not throw a TypeError
+    assert.doesNotThrow(() => {
+      // Call with a non-existent path — the function should resolve (not throw)
+      // since it handles errors internally via try/catch
+      const result = checkCliPresence("/tmp/this-code-nonexistent-" + Date.now());
+      // Must return a Promise (async function)
+      assert.ok(result instanceof Promise, "checkCliPresence must return a Promise");
+      // Swallow the promise to avoid unhandled rejection in test runner
+      result.catch(() => {});
+    });
+  });
+});
+
+suite("PKG-03: CLI detection — missing binary path", () => {
+  test("checkCliPresence resolves (does not reject) when CLI path does not exist", async () => {
+    const { checkCliPresence } = require("../cliDetect");
+    // Use a guaranteed-absent path — exercises the fs.access catch branch
+    const fakePath = "/tmp/this-code-absent-" + Date.now() + "/bin/this-code";
+    // Must resolve without throwing — per D-04 non-blocking contract
+    await assert.doesNotReject(
+      () => checkCliPresence(fakePath),
+      "checkCliPresence must not reject when CLI binary is absent",
+    );
+  });
+});
+
+suite("PKG-03: CLI detection — source contract", () => {
+  test("cliDetect.ts contains EXPECTED_CLI_MAJOR constant", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "cliDetect.ts"),
+      "utf-8",
+    );
+    assert.ok(
+      src.includes("EXPECTED_CLI_MAJOR"),
+      "cliDetect.ts must define EXPECTED_CLI_MAJOR constant",
+    );
+  });
+
+  test("cliDetect.ts uses fs.access for existence check (not fs.existsSync)", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "cliDetect.ts"),
+      "utf-8",
+    );
+    assert.ok(
+      src.includes("fs.access"),
+      "cliDetect.ts must use fs.access (async) for binary existence check",
+    );
+    assert.ok(
+      !src.includes("existsSync"),
+      "cliDetect.ts must not use existsSync (blocks extension host)",
+    );
+  });
+
+  test("cliDetect.ts uses execFile with timeout option", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "cliDetect.ts"),
+      "utf-8",
+    );
+    assert.ok(
+      src.includes("timeout"),
+      "execFile call must include timeout option to prevent hangs (Pitfall 5)",
+    );
+  });
+
+  test("extension.ts calls checkCliPresence with fire-and-forget pattern", () => {
+    const fs = require("fs");
+    const path = require("path");
+    const src = fs.readFileSync(
+      path.resolve(__dirname, "..", "..", "src", "extension.ts"),
+      "utf-8",
+    );
+    assert.ok(
+      src.includes("checkCliPresence().catch"),
+      "extension.ts must call checkCliPresence().catch() — fire-and-forget per D-04",
+    );
+    assert.ok(
+      !src.includes("await checkCliPresence"),
+      "extension.ts must NOT await checkCliPresence — D-04 requires non-blocking",
+    );
+  });
+});
+
 // Suppress unused import warnings — these will be used in later plans
 void path;
 void os;
