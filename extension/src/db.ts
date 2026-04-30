@@ -66,11 +66,15 @@ export async function initDatabase(db: Database): Promise<void> {
   await db.run("PRAGMA journal_mode=WAL");
   // Step 2: Busy timeout — CLI reader may hold a read lock; 5000ms prevents immediate SQLITE_BUSY errors
   await db.run("PRAGMA busy_timeout=5000");
-  // Step 3: Schema migration — idempotent via user_version check
+  // Step 3: Schema migration — idempotent via user_version check.
+  // Use a local currentVersion variable updated after each block so that
+  // cascading migrations (e.g. fresh install going 0→1→2) evaluate a fresh
+  // version rather than the stale pre-migration value from the initial read.
   const versionRow = await db.get<{ user_version: number }>(
     "PRAGMA user_version",
   );
-  if ((versionRow?.user_version ?? 0) < 1) {
+  let currentVersion = versionRow?.user_version ?? 0;
+  if (currentVersion < 1) {
     await db.run(`CREATE TABLE IF NOT EXISTS invocations (
       id                 INTEGER PRIMARY KEY AUTOINCREMENT,
       invoked_at         TEXT    NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now')),
@@ -90,11 +94,13 @@ export async function initDatabase(db: Database): Promise<void> {
       ON invocations(invoked_at DESC)`);
     // Mark schema version — future migrations check this first
     await db.run("PRAGMA user_version = 1");
+    currentVersion = 1;
   }
-  if ((versionRow?.user_version ?? 0) < 2) {
+  if (currentVersion < 2) {
     await db.run(
       "ALTER TABLE invocations ADD COLUMN ipc_hook_cli TEXT",
     );
     await db.run("PRAGMA user_version = 2");
+    currentVersion = 2;
   }
 }
