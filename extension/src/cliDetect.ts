@@ -11,7 +11,7 @@ const execFileAsync = promisify(execFile);
 const EXPECTED_CLI_MAJOR = 0;
 
 const DEFAULT_CLI_PATH = path.join(os.homedir(), ".this-code", "bin", "this-code");
-const CLI_DOWNLOAD_URL = "https://github.com/whardier/this-code/releases";
+const CLI_DOWNLOAD_URL = "https://github.com/whardier/this-code";
 
 export async function checkCliPresence(cliPath: string = DEFAULT_CLI_PATH): Promise<void> {
   // Phase 1 — existence check

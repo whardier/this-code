@@ -46,10 +46,10 @@ This project uses GSD (Get Shit Done) for structured execution.
 
 ### Storage Model
 
-- **Per-instance JSON**: `~/.vscode-server/bin/{commit-hash}/which-code-session.json`
+- **Per-instance JSON**: `~/.vscode-server/bin/{commit-hash}/this-code-session.json`
   - Primary record for each VS Code Server instance
   - Zero locking concerns, collocated with server binary
-- **SQLite index**: `~/.which-code/sessions.db` (WAL mode + busy_timeout)
+- **SQLite index**: `~/.this-code/sessions.db` (WAL mode + busy_timeout)
   - Aggregated store for CLI querying across all instances
   - `extensionKind: ["workspace"]` means this lives on the same machine as the files
 
@@ -62,7 +62,7 @@ This project uses GSD (Get Shit Done) for structured execution.
 
 ### CLI Architecture
 
-- Installed at `~/.which-code/bin/` (dedicated directory, no PATH pollution)
+- Installed at `~/.this-code/bin/` (dedicated directory, no PATH pollution)
 - Symlinked/copied as `code` when used as shim
 - Self-detection: env var guard (`THIS_CODE_ACTIVE=1`) + PATH stripping (pyenv/rbenv pattern)
 - Shell integration: `this-code init bash|zsh|fish` prints eval-able setup

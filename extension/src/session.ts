@@ -12,6 +12,7 @@ export interface SessionMetadata {
   remote_server_path: string | null;
   server_commit_hash: string | null;
   local_session_hash: string;
+  ipc_hook_cli: string | null;
 }
 
 // --- Private helpers ---
@@ -160,6 +161,7 @@ export function collectSessionMetadata(
     remote_server_path: serverBinPath,
     server_commit_hash: commitHash,
     local_session_hash: localSessionHash,
+    ipc_hook_cli: process.env["VSCODE_IPC_HOOK_CLI"] ?? null,
   };
 }
 

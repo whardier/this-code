@@ -23,6 +23,7 @@ export async function writeSessionJson(
     remote_name: metadata.remote_name,
     remote_server_path: metadata.remote_server_path,
     server_commit_hash: metadata.server_commit_hash,
+    ipc_hook_cli: metadata.ipc_hook_cli,
     open_files: [], // populated by document event handlers after activation
   };
 

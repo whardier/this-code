@@ -1,4 +1,4 @@
-use crate::config::Config;
+use crate::{config::Config, db, query};
 use anyhow::Result;
 use directories::BaseDirs;
 use std::{
@@ -62,6 +62,8 @@ pub(crate) fn discover_real_code(config: &Config, own_bin_dir: &Path) -> Result<
 /// Exec the real `code` binary, replacing the current process.
 ///
 /// Sets `THIS_CODE_ACTIVE=1` on the child environment to prevent recursion.
+/// If `ipc_hook` is `Some`, also sets `VSCODE_IPC_HOOK_CLI` so that
+/// `remote-cli/code` can communicate with the running VS Code Server instance.
 ///
 /// On Unix: uses `CommandExt::exec()` — replaces the current process.
 /// On Windows: uses `Command::status()` + `process::exit()` (no exec on Windows).
@@ -74,12 +76,15 @@ pub(crate) fn discover_real_code(config: &Config, own_bin_dir: &Path) -> Result<
 pub(crate) fn exec_real_code(
     real_code: &Path,
     args: impl IntoIterator<Item = OsString>,
+    ipc_hook: Option<&str>,
 ) -> Result<()> {
     use std::os::unix::process::CommandExt;
-    let err = std::process::Command::new(real_code)
-        .args(args)
-        .env("THIS_CODE_ACTIVE", "1")
-        .exec();
+    let mut cmd = std::process::Command::new(real_code);
+    cmd.args(args).env("THIS_CODE_ACTIVE", "1");
+    if let Some(ipc) = ipc_hook {
+        cmd.env("VSCODE_IPC_HOOK_CLI", ipc);
+    }
+    let err = cmd.exec();
     // exec() only returns on failure
     Err(anyhow::anyhow!("exec failed: {err}").context(format!(
         "Failed to exec real `code` binary at {}",
@@ -91,12 +96,92 @@ pub(crate) fn exec_real_code(
 pub(crate) fn exec_real_code(
     real_code: &Path,
     args: impl IntoIterator<Item = OsString>,
+    ipc_hook: Option<&str>,
 ) -> Result<()> {
-    let status = std::process::Command::new(real_code)
-        .args(args)
-        .env("THIS_CODE_ACTIVE", "1")
-        .status()?;
+    let mut cmd = std::process::Command::new(real_code);
+    cmd.args(args).env("THIS_CODE_ACTIVE", "1");
+    if let Some(ipc) = ipc_hook {
+        cmd.env("VSCODE_IPC_HOOK_CLI", ipc);
+    }
+    let status = cmd.status()?;
     std::process::exit(status.code().unwrap_or(1));
+}
+
+/// Extract the lookup path from shim arguments.
+///
+/// Uses the first non-flag argument as the candidate path. Strips the
+/// `:line:col` suffix that VS Code appends for `--goto` navigation.
+/// Falls back to cwd when no positional argument is present.
+fn resolve_shim_lookup_path(args: &[OsString]) -> PathBuf {
+    for arg in args {
+        let s = arg.to_string_lossy();
+        if s.starts_with('-') {
+            continue;
+        }
+        // Strip :line:col suffix used by `code --goto file.ts:10:5`
+        let path_part = s.split(':').next().unwrap_or(&s);
+        return PathBuf::from(path_part);
+    }
+    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+}
+
+/// Attempt to find the `remote-cli/code` binary via the session store.
+///
+/// Resolves the lookup path from the first positional argument (or cwd),
+/// walks the directory ancestry to find a matching session row, then
+/// constructs the `remote-cli/code` path from `remote_server_path`.
+///
+/// Returns `Some((binary_path, ipc_hook_cli))` on success, where
+/// `ipc_hook_cli` is the `VSCODE_IPC_HOOK_CLI` socket path from the session
+/// (required by `remote-cli/code` to communicate with the running server).
+///
+/// Returns `None` when:
+/// - DB does not exist or cannot be opened
+/// - No session found for the path ancestry
+/// - `remote_server_path` is not set in the session
+/// - Neither layout produces a binary that exists on disk
+fn discover_remote_cli(config: &Config, args: &[OsString]) -> Option<(PathBuf, Option<String>)> {
+    let db_path = config.db_path.clone().unwrap_or_else(|| {
+        BaseDirs::new().map_or_else(
+            || PathBuf::from(".this-code/sessions.db"),
+            |b| b.home_dir().join(".this-code/sessions.db"),
+        )
+    });
+
+    if !db_path.exists() {
+        return None;
+    }
+
+    let conn = db::open_db(&db_path).ok()?;
+    let lookup = resolve_shim_lookup_path(args);
+    let canonical = std::fs::canonicalize(&lookup).unwrap_or(lookup);
+
+    tracing::debug!(path = %canonical.display(), "session lookup path");
+
+    let session = query::find_session_by_ancestry(&conn, &canonical).ok()??;
+    let ipc_hook_cli = session.ipc_hook_cli.clone();
+
+    let remote_server_path = PathBuf::from(session.remote_server_path.as_deref()?);
+
+    // Current layout: {remote_server_path}/server/bin/remote-cli/code
+    let current = remote_server_path.join("server/bin/remote-cli/code");
+    if current.exists() {
+        tracing::debug!(path = %current.display(), "found remote-cli (current layout)");
+        return Some((current, ipc_hook_cli));
+    }
+
+    // Legacy layout: {remote_server_path}/bin/remote-cli/code
+    let legacy = remote_server_path.join("bin/remote-cli/code");
+    if legacy.exists() {
+        tracing::debug!(path = %legacy.display(), "found remote-cli (legacy layout)");
+        return Some((legacy, ipc_hook_cli));
+    }
+
+    tracing::debug!(
+        path = %remote_server_path.display(),
+        "remote_server_path set but remote-cli binary not found at either layout"
+    );
+    None
 }
 
 /// Run the shim pass-through.
@@ -117,13 +202,23 @@ pub(crate) fn run_shim(config: &Config) -> Result<()> {
     if is_recursion_guard_active() {
         tracing::debug!("recursion guard active — fast path to real code binary");
         let real_code = discover_real_code(config, &own_bin_dir)?;
-        return exec_real_code(&real_code, args);
+        return exec_real_code(&real_code, args, None);
     }
 
-    // Normal shim path: discover real binary and exec with guard set.
+    // Session-based routing: prefer remote-cli when a session exists for this path.
+    if let Some((remote_cli, ipc_hook)) = discover_remote_cli(config, &args) {
+        tracing::debug!(
+            binary = %remote_cli.display(),
+            ipc_hook = ?ipc_hook,
+            "routing via session store to remote-cli"
+        );
+        return exec_real_code(&remote_cli, args, ipc_hook.as_deref());
+    }
+
+    // PATH fallback: no session found, strip own bin dir and exec via PATH.
     let real_code = discover_real_code(config, &own_bin_dir)?;
-    tracing::debug!(binary = %real_code.display(), args = ?args, "exec real code binary");
-    exec_real_code(&real_code, args)
+    tracing::debug!(binary = %real_code.display(), args = ?args, "exec real code binary (PATH fallback)");
+    exec_real_code(&real_code, args, None)
 }
 
 #[cfg(test)]
@@ -165,5 +260,45 @@ mod tests {
         let guard = std::env::var("THIS_CODE_ACTIVE").is_ok_and(|v| v == "1");
         // We just verify the function signature compiles and returns bool.
         let _ = guard;
+    }
+
+    #[test]
+    fn test_resolve_shim_lookup_path_positional_arg() {
+        let args: Vec<OsString> = vec![OsString::from("/some/path")];
+        let result = resolve_shim_lookup_path(&args);
+        assert_eq!(result, PathBuf::from("/some/path"));
+    }
+
+    #[test]
+    fn test_resolve_shim_lookup_path_skips_flags() {
+        let args: Vec<OsString> = vec![
+            OsString::from("--new-window"),
+            OsString::from("--wait"),
+            OsString::from("/some/path"),
+        ];
+        let result = resolve_shim_lookup_path(&args);
+        assert_eq!(result, PathBuf::from("/some/path"));
+    }
+
+    #[test]
+    fn test_resolve_shim_lookup_path_strips_goto_suffix() {
+        let args: Vec<OsString> = vec![OsString::from("file.ts:10:5")];
+        let result = resolve_shim_lookup_path(&args);
+        assert_eq!(result, PathBuf::from("file.ts"));
+    }
+
+    #[test]
+    fn test_resolve_shim_lookup_path_no_colon_unchanged() {
+        let args: Vec<OsString> = vec![OsString::from("./src/main.rs")];
+        let result = resolve_shim_lookup_path(&args);
+        assert_eq!(result, PathBuf::from("./src/main.rs"));
+    }
+
+    #[test]
+    fn test_resolve_shim_lookup_path_no_args_returns_something() {
+        // With no args, returns cwd or fallback "." — just confirm it doesn't panic
+        let args: Vec<OsString> = vec![];
+        let result = resolve_shim_lookup_path(&args);
+        assert!(!result.as_os_str().is_empty());
     }
 }

@@ -13,12 +13,12 @@ pub(crate) struct Session {
     pub(crate) local_ide_path: Option<String>,
     #[allow(dead_code)]
     pub(crate) remote_name: Option<String>,
-    #[allow(dead_code)]
     pub(crate) remote_server_path: Option<String>,
     pub(crate) server_commit_hash: Option<String>,
     #[allow(dead_code)]
     pub(crate) server_bin_path: Option<String>,
     pub(crate) open_files: String,
+    pub(crate) ipc_hook_cli: Option<String>,
 }
 
 pub(crate) fn open_db(path: &Path) -> Result<Connection> {
@@ -30,6 +30,12 @@ pub(crate) fn open_db(path: &Path) -> Result<Connection> {
             | OpenFlags::SQLITE_OPEN_NO_MUTEX,
     )?;
     conn.execute_batch("PRAGMA busy_timeout = 5000;")?;
+    // Add ipc_hook_cli column if the extension hasn't run its v2 migration yet.
+    // Error is intentionally ignored: "no such table" (DB not yet initialized)
+    // and "duplicate column name" (column already exists) are both expected.
+    let _ = conn.execute_batch(
+        "ALTER TABLE invocations ADD COLUMN ipc_hook_cli TEXT",
+    );
     Ok(conn)
 }
 
@@ -37,7 +43,7 @@ pub(crate) fn query_latest_session(conn: &Connection, workspace: &str) -> Result
     conn.query_row(
         "SELECT id, invoked_at, workspace_path, user_data_dir, profile,
                 local_ide_path, remote_name, remote_server_path,
-                server_commit_hash, server_bin_path, open_files
+                server_commit_hash, server_bin_path, open_files, ipc_hook_cli
          FROM invocations
          WHERE workspace_path = ?1
          ORDER BY invoked_at DESC
@@ -56,6 +62,7 @@ pub(crate) fn query_latest_session(conn: &Connection, workspace: &str) -> Result
                 server_commit_hash: row.get(8)?,
                 server_bin_path: row.get(9)?,
                 open_files: row.get(10)?,
+                ipc_hook_cli: row.get(11)?,
             })
         },
     )
@@ -83,7 +90,8 @@ mod tests {
                 remote_server_path TEXT,
                 server_commit_hash TEXT,
                 server_bin_path    TEXT,
-                open_files         TEXT    NOT NULL DEFAULT '[]'
+                open_files         TEXT    NOT NULL DEFAULT '[]',
+                ipc_hook_cli       TEXT
             );",
         )
         .unwrap();

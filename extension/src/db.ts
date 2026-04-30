@@ -91,4 +91,10 @@ export async function initDatabase(db: Database): Promise<void> {
     // Mark schema version — future migrations check this first
     await db.run("PRAGMA user_version = 1");
   }
+  if ((versionRow?.user_version ?? 0) < 2) {
+    await db.run(
+      "ALTER TABLE invocations ADD COLUMN ipc_hook_cli TEXT",
+    );
+    await db.run("PRAGMA user_version = 2");
+  }
 }

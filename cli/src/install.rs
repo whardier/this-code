@@ -34,27 +34,45 @@ const FISH_FILE_CONTENT: &str = "# this-code fish integration
 fish_add_path --prepend \"$HOME/.this-code/bin\"
 ";
 
-/// Create the code → this-code symlink inside `bin_dir`.
+/// Create the `code` symlink inside `bin_dir` pointing at the running `this-code` binary.
+///
+/// Target selection:
+/// - **Relative** (`code` → `this-code`) when the running binary lives in the same directory as
+///   `bin_dir`. This is the default `cargo install --root ~/.this-code` case and stays correct
+///   if the user moves their home directory.
+/// - **Absolute** (`code` → `/abs/path/to/this-code`) when the binary is in a different
+///   directory (e.g. Homebrew `/opt/homebrew/bin/this-code`, system package manager, or manual
+///   install into `/usr/local/bin`). The absolute path is taken from `current_exe()` which on
+///   macOS returns the as-invoked path (the keg symlink, not the cellar), so `brew upgrade`
+///   keeps working without re-running `this-code install`.
 ///
 /// Idempotent: removes existing symlink or file before recreating.
 ///
-/// CRITICAL arg order: `symlink(original, link)` — first arg is the TARGET, second is the LINK.
-/// `symlink("this-code", bin_dir/code)` means: `code` → `this-code` (relative, both in same dir).
+/// CRITICAL arg order: `symlink(target, link)` — first arg is the TARGET (what the link points
+/// to), second is the LINK path being created.
 #[cfg(unix)]
 fn create_code_symlink(bin_dir: &Path) -> Result<()> {
     let symlink_path = bin_dir.join("code");
-    let target = std::path::Path::new("this-code"); // relative target — both in same directory
+
+    let exe = std::env::current_exe()
+        .map_err(|e| anyhow::anyhow!("Cannot determine current executable path: {e}"))?;
+
+    // Use a relative target only when the binary lives in the same directory as bin_dir.
+    let target: std::path::PathBuf = if exe.parent() == Some(bin_dir) {
+        std::path::PathBuf::from("this-code")
+    } else {
+        exe.clone()
+    };
 
     // Idempotency: remove existing file or (broken) symlink before recreating.
-    // symlink_metadata() returns Ok even for broken symlinks; exists() returns false for broken.
     if symlink_path.symlink_metadata().is_ok() {
         std::fs::remove_file(&symlink_path)?;
     }
 
-    std::os::unix::fs::symlink(target, &symlink_path)?;
+    std::os::unix::fs::symlink(&target, &symlink_path)?;
     tracing::debug!(
         link = %symlink_path.display(),
-        target = "this-code",
+        target = %target.display(),
         "created symlink"
     );
     Ok(())
@@ -65,7 +83,15 @@ fn create_code_symlink(bin_dir: &Path) -> Result<()> {
     // Windows symlinks require Developer Mode or admin privilege.
     // PLAT-02 best-effort: attempt creation, report clear error on failure.
     let symlink_path = bin_dir.join("code.exe");
-    let target = bin_dir.join("this-code.exe");
+
+    let exe = std::env::current_exe()
+        .map_err(|e| anyhow::anyhow!("Cannot determine current executable path: {e}"))?;
+
+    let target: std::path::PathBuf = if exe.parent() == Some(bin_dir) {
+        std::path::PathBuf::from("this-code.exe")
+    } else {
+        exe
+    };
 
     if symlink_path.symlink_metadata().is_ok() {
         std::fs::remove_file(&symlink_path)?;

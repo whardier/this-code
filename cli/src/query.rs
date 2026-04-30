@@ -143,6 +143,7 @@ mod tests {
             server_commit_hash: Some("abc123def456".to_string()),
             server_bin_path: None,
             open_files: "[\"src/main.rs\",\"README.md\"]".to_string(),
+            ipc_hook_cli: None,
         }
     }
 
@@ -229,7 +230,8 @@ mod tests {
                  remote_server_path TEXT,
                  server_commit_hash TEXT,
                  server_bin_path    TEXT,
-                 open_files         TEXT    NOT NULL DEFAULT '[]'
+                 open_files         TEXT    NOT NULL DEFAULT '[]',
+                 ipc_hook_cli       TEXT
              );",
         )
         .unwrap();
