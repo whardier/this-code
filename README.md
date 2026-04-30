@@ -1,5 +1,10 @@
 # This Code
 
+[![Extension CI](https://github.com/whardier/this-code/actions/workflows/ext-ci.yml/badge.svg)](https://github.com/whardier/this-code/actions/workflows/ext-ci.yml)
+[![CLI CI](https://github.com/whardier/this-code/actions/workflows/cli-ci.yml/badge.svg)](https://github.com/whardier/this-code/actions/workflows/cli-ci.yml)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/whardier.this-code?label=marketplace)](https://marketplace.visualstudio.com/items?itemName=whardier.this-code)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 > Never think about which VS Code instance or profile to use again.
 
 **This Code** (`whardier.this-code`) is a VS Code extension + Rust CLI pair that silently records session state wherever VS Code runs and routes subsequent `code` invocations to the right instance automatically.
