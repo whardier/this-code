@@ -3,79 +3,54 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - 'README.md'
+      - 'LICENSE'
+      - 'prek.toml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [main]
+    paths:
+      - 'README.md'
+      - 'LICENSE'
+      - 'prek.toml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/**'
+      - '.github/workflows/**'
 
 jobs:
-  build:
-    name: Build and typecheck (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-      fail-fast: false
+  root:
+    name: Root checks
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: extension/package-lock.json
-
-      - name: Install Xvfb (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y xvfb
-
-      - name: Install dependencies
-        working-directory: extension
-        run: npm ci
-
-      - name: TypeScript typecheck
-        working-directory: extension
-        run: npx tsc --noEmit
-
-      - name: Build extension bundle
-        working-directory: extension
-        run: npm run build
-
-      - name: Run integration tests (Linux)
-        if: runner.os == 'Linux'
-        working-directory: extension
-        run: xvfb-run -a npm test
-
-      - name: Run integration tests (macOS)
-        if: runner.os != 'Linux'
-        working-directory: extension
-        run: npm test
-
-      - name: Verify manifest
-        working-directory: extension
+      - name: Verify required files
         run: |
-          node -e "
-            const p = require('./package.json');
-            const id = p.publisher + '.' + p.name;
-            if (id !== 'whardier.this-code') throw new Error('Wrong ID: ' + id);
-            if (JSON.stringify(p.extensionKind) !== '[\"workspace\"]') throw new Error('extensionKind wrong');
-            if (!p.activationEvents.includes('onStartupFinished')) throw new Error('activationEvents wrong');
-            if (p.contributes.commands) throw new Error('commands must not exist');
-            const keys = Object.keys(p.contributes.configuration.properties).sort().join(',');
-            if (keys !== 'thisCode.enable,thisCode.logLevel') throw new Error('settings wrong: ' + keys);
-            console.log('Manifest OK:', id);
+          test -s LICENSE && echo "LICENSE OK"
+          test -s README.md && echo "README.md OK"
+
+      - name: Validate prek.toml (TOML syntax)
+        run: python3 -c "import tomllib, sys; tomllib.load(open(sys.argv[1], 'rb')); print('prek.toml OK')" prek.toml
+
+      - name: Validate workflow YAML syntax
+        run: |
+          python3 -c "
+          import yaml, glob, sys
+          errors = []
+          for f in sorted(glob.glob('.github/workflows/*.yml')):
+              try:
+                  yaml.safe_load(open(f))
+                  print(f'OK: {f}')
+              except yaml.YAMLError as e:
+                  errors.append(f'{f}: {e}')
+          if errors:
+              print('\n'.join(errors), file=sys.stderr)
+              sys.exit(1)
           "
-
-      - name: Verify dist output
-        working-directory: extension
-        run: test -f dist/extension.js && echo "dist/extension.js exists"
-
-      - name: Check no save trigger
-        working-directory: extension
-        run: |
-          if grep -r "onDidSaveTextDocument" src/ --exclude-dir=test; then
-            echo "ERROR: onDidSaveTextDocument found in source — TRACK-05 violation"
-            exit 1
-          fi
-          echo "TRACK-05 OK: no onDidSaveTextDocument"
