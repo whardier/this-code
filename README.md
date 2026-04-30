@@ -153,8 +153,11 @@ this-code install --fish
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `thisCode.enable` | `true` | Enable or disable session recording |
+| `thisCode.enable` | `false` | Enable or disable session recording |
 | `thisCode.logLevel` | `"info"` | Output channel verbosity (`"off"`, `"info"`, `"debug"`) |
+
+> [!WARNING]
+> Session recording is **disabled by default**. The extension will not write any data until `thisCode.enable` is explicitly set to `true`. This is intentional — the extension runs on every remote host you connect to via SSH or Dev Containers, and you should only enable it on machines where you want session state tracked. Enable it per-machine via workspace or remote settings, not globally, unless you want recording on every host.
 
 ---
 

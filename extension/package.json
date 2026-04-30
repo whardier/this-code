@@ -9,7 +9,7 @@
     "configuration": {
       "properties": {
         "thisCode.enable": {
-          "default": true,
+          "default": false,
           "description": "Enable session recording.",
           "type": "boolean"
         },
