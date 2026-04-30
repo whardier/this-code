@@ -107,6 +107,32 @@ pub(crate) fn exec_real_code(
     std::process::exit(status.code().unwrap_or(1));
 }
 
+/// Strip a trailing `:N` or `:N:N` goto suffix from a path string.
+///
+/// VS Code appends `:line` or `:line:col` (both integers) to `--goto` arguments.
+/// Only strips when the trailing colon-separated components are all ASCII digits,
+/// so Windows drive letters (`C:\...`) and paths with colons in directory names
+/// are preserved unchanged.
+fn strip_goto_suffix(s: &str) -> &str {
+    // Find the last colon; if everything after it is digits, it may be a line/col suffix.
+    if let Some(last_colon) = s.rfind(':') {
+        let after_last = &s[last_colon + 1..];
+        if !after_last.is_empty() && after_last.chars().all(|c| c.is_ascii_digit()) {
+            let prefix = &s[..last_colon];
+            // Check whether the segment before the last colon is also a digit run
+            // (i.e. we have both :line:col — strip both at once).
+            if let Some(prev_colon) = prefix.rfind(':') {
+                let middle = &prefix[prev_colon + 1..];
+                if !middle.is_empty() && middle.chars().all(|c| c.is_ascii_digit()) {
+                    return &prefix[..prev_colon];
+                }
+            }
+            return prefix;
+        }
+    }
+    s
+}
+
 /// Extract the lookup path from shim arguments.
 ///
 /// Uses the first non-flag argument as the candidate path. Strips the
@@ -118,8 +144,9 @@ fn resolve_shim_lookup_path(args: &[OsString]) -> PathBuf {
         if s.starts_with('-') {
             continue;
         }
-        // Strip :line:col suffix used by `code --goto file.ts:10:5`
-        let path_part = s.split(':').next().unwrap_or(&s);
+        // Strip :line or :line:col suffix (integers only) to avoid corrupting
+        // Windows drive letters (C:\...) or paths with colons in directory names.
+        let path_part = strip_goto_suffix(&s);
         return PathBuf::from(path_part);
     }
     std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
@@ -300,5 +327,44 @@ mod tests {
         let args: Vec<OsString> = vec![];
         let result = resolve_shim_lookup_path(&args);
         assert!(!result.as_os_str().is_empty());
+    }
+
+    // strip_goto_suffix unit tests
+    #[test]
+    fn test_strip_goto_suffix_line_and_col() {
+        assert_eq!(strip_goto_suffix("file.ts:10:5"), "file.ts");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_line_only() {
+        assert_eq!(strip_goto_suffix("file.ts:10"), "file.ts");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_no_suffix() {
+        assert_eq!(strip_goto_suffix("file.ts"), "file.ts");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_absolute_path_with_suffix() {
+        assert_eq!(strip_goto_suffix("/home/user/file.rs:42:1"), "/home/user/file.rs");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_windows_drive_letter_preserved() {
+        // C: looks like a colon suffix but "C" is not all-digits — must not strip
+        assert_eq!(strip_goto_suffix("C:\\Users\\foo\\bar.ts:10:5"), "C:\\Users\\foo\\bar.ts");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_colon_in_dir_name_preserved() {
+        // Unusual but valid on Linux: directory name contains a colon
+        // "some:dir/file.ts" — "dir/file.ts" is not all-digits, so nothing is stripped
+        assert_eq!(strip_goto_suffix("some:dir/file.ts"), "some:dir/file.ts");
+    }
+
+    #[test]
+    fn test_strip_goto_suffix_empty_string() {
+        assert_eq!(strip_goto_suffix(""), "");
     }
 }
