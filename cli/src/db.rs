@@ -9,13 +9,13 @@ pub(crate) struct Session {
     pub(crate) workspace_path: String,
     pub(crate) user_data_dir: Option<String>,
     pub(crate) profile: Option<String>,
-    #[allow(dead_code)]
+    /// Populated from DB; consumed by future which/routing subcommands.
     pub(crate) local_ide_path: Option<String>,
-    #[allow(dead_code)]
+    /// Populated from DB; reserved for remote-name tracking in a future phase.
     pub(crate) remote_name: Option<String>,
     pub(crate) remote_server_path: Option<String>,
     pub(crate) server_commit_hash: Option<String>,
-    #[allow(dead_code)]
+    /// Aliased to `remote_server_path` in INSERT; kept for schema compatibility.
     pub(crate) server_bin_path: Option<String>,
     pub(crate) open_files: String,
     pub(crate) ipc_hook_cli: Option<String>,

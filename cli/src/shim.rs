@@ -186,9 +186,10 @@ fn discover_remote_cli(config: &Config, args: &[OsString]) -> Option<(PathBuf, O
     tracing::debug!(path = %canonical.display(), "session lookup path");
 
     let session = query::find_session_by_ancestry(&conn, &canonical).ok()??;
-    let ipc_hook_cli = session.ipc_hook_cli.clone();
-
+    // Resolve remote_server_path first (borrows then drops), then move ipc_hook_cli
+    // out of session directly — avoids a needless clone of Option<String>.
     let remote_server_path = PathBuf::from(session.remote_server_path.as_deref()?);
+    let ipc_hook_cli = session.ipc_hook_cli; // moved, not cloned
 
     // Current layout: {remote_server_path}/server/bin/remote-cli/code
     let current = remote_server_path.join("server/bin/remote-cli/code");
@@ -279,14 +280,11 @@ mod tests {
     }
 
     #[test]
-    fn test_recursion_guard_false_when_unset() {
-        // Can't easily unset env vars in unit tests without unsafe; test the false branch
-        // by checking the logic when env var is missing (best effort — relies on test env).
-        // If THIS_CODE_ACTIVE=1 is set in test runner, this will report false positive.
-        // Real behavior verified by the integration verify step.
-        let guard = std::env::var("THIS_CODE_ACTIVE").is_ok_and(|v| v == "1");
-        // We just verify the function signature compiles and returns bool.
-        let _ = guard;
+    fn recursion_guard_matches_env_var() {
+        // Verify is_recursion_guard_active() reflects the actual env state,
+        // not a local reimplementation of the same logic.
+        let expected = std::env::var("THIS_CODE_ACTIVE").is_ok_and(|v| v == "1");
+        assert_eq!(is_recursion_guard_active(), expected);
     }
 
     #[test]
