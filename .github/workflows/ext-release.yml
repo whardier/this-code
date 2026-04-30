@@ -57,7 +57,7 @@ jobs:
 
       - name: Configure npm architecture (cross-compile)
         if: matrix.npm_arch != ''
-        run: npm config set arch ${{ matrix.npm_arch }}
+        run: echo "npm_config_arch=${{ matrix.npm_arch }}" >> "$GITHUB_ENV"
 
       - name: Install dependencies
         working-directory: extension
