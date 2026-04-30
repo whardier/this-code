@@ -18,8 +18,9 @@ jobs:
             target: linux-arm64
           - os: macos-latest
             target: darwin-arm64
-          - os: macos-15-large
+          - os: macos-latest
             target: darwin-x64
+            rust_target: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -28,9 +29,11 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
 
       - name: Cache Cargo registry and build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry/index/
@@ -43,18 +46,18 @@ jobs:
 
       - name: Build release binary
         working-directory: cli
-        run: cargo build --release
+        run: cargo build --release ${{ matrix.rust_target && format('--target {0}', matrix.rust_target) || '' }}
 
       - name: Strip binary
         working-directory: cli
-        run: strip target/release/this-code
+        run: strip ${{ matrix.rust_target && format('target/{0}/release/this-code', matrix.rust_target) || 'target/release/this-code' }}
 
       - name: Rename binary with platform suffix
         working-directory: cli
-        run: cp target/release/this-code this-code-${{ matrix.target }}
+        run: cp ${{ matrix.rust_target && format('target/{0}/release/this-code', matrix.rust_target) || 'target/release/this-code' }} this-code-${{ matrix.target }}
 
       - name: Upload CLI binary artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cli-${{ matrix.target }}
           path: cli/this-code-${{ matrix.target }}
@@ -67,7 +70,7 @@ jobs:
       contents: write
     steps:
       - name: Download all CLI binary artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           pattern: cli-*
           merge-multiple: true
