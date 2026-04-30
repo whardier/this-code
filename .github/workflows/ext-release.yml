@@ -64,6 +64,34 @@ jobs:
         working-directory: extension
         run: npm test
 
+      - name: Verify manifest
+        working-directory: extension
+        run: |
+          node -e "
+            const p = require('./package.json');
+            const id = p.publisher + '.' + p.name;
+            if (id !== 'whardier.this-code') throw new Error('Wrong ID: ' + id);
+            if (JSON.stringify(p.extensionKind) !== '[\"workspace\"]') throw new Error('extensionKind wrong');
+            if (!p.activationEvents.includes('onStartupFinished')) throw new Error('activationEvents wrong');
+            if (p.contributes.commands) throw new Error('commands must not exist');
+            const keys = Object.keys(p.contributes.configuration.properties).sort().join(',');
+            if (keys !== 'thisCode.enable,thisCode.logLevel') throw new Error('settings wrong: ' + keys);
+            console.log('Manifest OK:', id);
+          "
+
+      - name: Verify dist output
+        working-directory: extension
+        run: test -f dist/extension.js && echo "dist/extension.js exists"
+
+      - name: Check no save trigger
+        working-directory: extension
+        run: |
+          if grep -r "onDidSaveTextDocument" src/ --exclude-dir=test; then
+            echo "ERROR: onDidSaveTextDocument found in source — TRACK-05 violation"
+            exit 1
+          fi
+          echo "TRACK-05 OK: no onDidSaveTextDocument"
+
       - name: Package VSIX
         working-directory: extension
         run: |
