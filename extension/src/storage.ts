@@ -66,6 +66,7 @@ export async function scanExistingRemoteSessions(
         remote_server_path?: string | null;
         server_commit_hash?: string | null;
         server_bin_path?: string | null;
+        ipc_hook_cli?: string | null;
         open_files?: string[];
       };
 
@@ -73,8 +74,9 @@ export async function scanExistingRemoteSessions(
       await db.run(
         `INSERT INTO invocations
          (workspace_path, user_data_dir, profile, local_ide_path,
-          remote_name, remote_server_path, server_commit_hash, server_bin_path, open_files)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          remote_name, remote_server_path, server_commit_hash, server_bin_path,
+          ipc_hook_cli, open_files)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           session.workspace_path ?? null,
           session.user_data_dir ?? null,
@@ -84,6 +86,7 @@ export async function scanExistingRemoteSessions(
           entryDir, // authoritative remote_server_path for dedup
           session.server_commit_hash ?? null,
           session.server_bin_path ?? null,
+          session.ipc_hook_cli ?? null,
           JSON.stringify(session.open_files ?? []),
         ],
       );
