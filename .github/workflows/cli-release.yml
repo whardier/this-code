@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'cli/v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 1.0.0-alpha.1) — GitHub Release is skipped on manual dispatch'
+        required: true
+        type: string
 
 jobs:
   build-cli:
@@ -65,6 +71,7 @@ jobs:
   release-cli:
     name: Create CLI GitHub Release
     needs: [build-cli]
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write

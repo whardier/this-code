@@ -1,5 +1,17 @@
 # Release Guide
 
+## Pre-Release Matrix Verification
+
+Before tagging either component, run the full 4-platform matrix manually to catch build or test failures across all targets:
+
+**Extension** — go to Actions → Extension Release → Run workflow, enter the target version (e.g. `1.1.0`). All four platform jobs run; the GitHub Release step is skipped.
+
+**CLI** — go to Actions → CLI Release → Run workflow, enter the target version (e.g. `1.0.0-alpha.1`). All four platform binaries are built and uploaded as artifacts; the GitHub Release step is skipped.
+
+Download the artifacts from the workflow run and smoke-test on your platform before proceeding to tag.
+
+---
+
 ## Extension Release (Marketplace)
 
 ### 1. Tag and trigger CI

@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'ext/v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g. 1.1.0) — GitHub Release is skipped on manual dispatch'
+        required: true
+        type: string
 
 jobs:
   build-and-test:
@@ -26,6 +32,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            V="${{ github.ref_name }}"
+            V="${V#ext/v}"
+          else
+            V="${{ inputs.version }}"
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -95,10 +112,8 @@ jobs:
       - name: Package VSIX
         working-directory: extension
         run: |
-          VERSION="${{ github.ref_name }}"
-          VERSION="${VERSION#ext/v}"
           npx @vscode/vsce package --target ${{ matrix.target }} \
-            -o this-code-${VERSION}-${{ matrix.target }}.vsix
+            -o this-code-${{ steps.version.outputs.version }}-${{ matrix.target }}.vsix
 
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v6
@@ -109,6 +124,7 @@ jobs:
   release:
     name: Create GitHub Release
     needs: [build-and-test]
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
