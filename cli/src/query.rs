@@ -121,6 +121,7 @@ fn session_to_json(session: &db::Session) -> serde_json::Value {
         "remote_server_path": session.remote_server_path,
         "server_commit_hash": session.server_commit_hash,
         "server_bin_path": session.server_bin_path,
+        "ipc_hook_cli": session.ipc_hook_cli,
         "open_files": open_files_value,
     })
 }
