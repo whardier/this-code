@@ -40,9 +40,9 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             cli/target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('cli/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.rust_target || 'native' }}-cargo-${{ hashFiles('cli/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-${{ matrix.rust_target || 'native' }}-cargo-
 
       - name: Build release binary
         working-directory: cli
