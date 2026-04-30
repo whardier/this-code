@@ -99,8 +99,8 @@ export async function activate(
         metadata.remote_name,
         metadata.remote_server_path,
         metadata.server_commit_hash,
-        metadata.remote_server_path,
-        metadata.ipc_hook_cli,
+        metadata.remote_server_path, // server_bin_path — intentional alias; SessionMetadata has no dedicated server_bin_path field
+        metadata.ipc_hook_cli,       // ipc_hook_cli
         "[]",
       ],
     );
