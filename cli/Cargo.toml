@@ -1,8 +1,10 @@
 [package]
 name = "this-code"
-version = "0.1.0"
+version = "1.0.0-alpha.1"
 edition = "2024"
 authors = ["Shane Spencer"]
+repository = "https://github.com/whardier/this-code"
+
 license = "MIT"
 publish = false
 
