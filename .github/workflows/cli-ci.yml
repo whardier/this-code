@@ -10,9 +10,6 @@ on:
       - 'cli/**'
       - '.github/workflows/cli-ci.yml'
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     name: Rust CLI (${{ matrix.os }})
@@ -26,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable

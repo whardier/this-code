@@ -145,9 +145,9 @@ suite("STOR-03: Schema columns", () => {
       "invocations columns must match schema (D-07/STOR-03)",
     );
 
-    // Verify user_version is 1 (idempotent migration marker)
+    // Verify user_version is 2 (idempotent migration marker)
     const vRow = (await db.get("PRAGMA user_version")) as any;
-    assert.strictEqual(vRow.user_version, 1);
+    assert.strictEqual(vRow.user_version, 2);
 
     await db.close();
     await fs.rm(tmpDir, { recursive: true, force: true });
