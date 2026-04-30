@@ -9,7 +9,6 @@ use std::path::Path;
 /// in /etc/zprofile runs after ~/.zshenv and would reorder PATH; sourcing from ~/.zshrc
 /// ensures this-code stays leftmost).
 ///
-/// Uses `THIS_CODE_HOME` (not `WHICH_CODE_HOME` — project renamed from which-code to this-code).
 const ENV_FILE_CONTENT: &str = "#!/bin/sh
 # this-code shell integration
 # Source this file from ~/.bashrc or ~/.zshrc:

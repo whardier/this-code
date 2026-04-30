@@ -1,4 +1,5 @@
 {
+  "name": "this-code-workspace",
   "dependencies": {
     "get-shit-done-cc": "^1.38.3"
   }
