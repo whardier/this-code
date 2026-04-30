@@ -1,56 +1,36 @@
 {
-  "name": "this-code",
-  "displayName": "This Code",
-  "description": "Session tracking for VS Code launch context and open file manifests",
-  "version": "0.1.0",
-  "publisher": "whardier",
-  "engines": {
-    "vscode": "^1.75.0"
-  },
-  "categories": [
-    "Other"
-  ],
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
-  "extensionKind": [
-    "workspace"
+  "categories": [
+    "Other"
   ],
   "contributes": {
     "configuration": {
-      "title": "This Code",
       "properties": {
         "thisCode.enable": {
-          "type": "boolean",
           "default": true,
-          "description": "Enable session recording."
+          "description": "Enable session recording.",
+          "type": "boolean"
         },
         "thisCode.logLevel": {
-          "type": "string",
+          "default": "info",
+          "description": "Output channel verbosity.",
           "enum": [
             "off",
             "info",
             "debug"
           ],
-          "default": "info",
-          "description": "Output channel verbosity."
+          "type": "string"
         }
-      }
+      },
+      "title": "This Code"
     }
-  },
-  "scripts": {
-    "build": "node esbuild.js",
-    "build:prod": "node esbuild.js --production",
-    "watch": "node esbuild.js --watch",
-    "typecheck": "tsc --noEmit",
-    "pretest": "tsc -p tsconfig.test.json",
-    "test": "vscode-test",
-    "package": "vsce package"
   },
   "dependencies": {
     "@vscode/sqlite3": "^5.1.12-vscode"
   },
+  "description": "Session tracking for VS Code launch context and open file manifests",
   "devDependencies": {
     "@types/node": "^25.6.0",
     "@types/vscode": "^1.75.0",
@@ -59,5 +39,29 @@
     "@vscode/vsce": "^3.9.0",
     "esbuild": "^0.28.0",
     "typescript": "~5.7.0"
-  }
+  },
+  "displayName": "This Code",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.js",
+  "name": "this-code",
+  "publisher": "whardier",
+  "repository": "https://github.com/whardier/this-code",
+  "scripts": {
+    "build": "node esbuild.js",
+    "build:prod": "node esbuild.js --production",
+    "package": "vsce package",
+    "postpackage": "rm -f LICENSE",
+    "prepackage": "cp ../LICENSE LICENSE",
+    "pretest": "tsc -p tsconfig.test.json",
+    "vscode:prepublish": "node esbuild.js --production",
+    "test": "vscode-test",
+    "typecheck": "tsc --noEmit",
+    "watch": "node esbuild.js --watch"
+  },
+  "version": "0.1.0"
 }
