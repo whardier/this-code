@@ -5,8 +5,8 @@
 ### 1. Tag and trigger CI
 
 ```bash
-git tag ext/v0.1.0
-git push origin ext/v0.1.0
+git tag ext/v1.1.0
+git push origin ext/v1.1.0
 ```
 
 This triggers `.github/workflows/ext-release.yml`, which builds 4 platform VSIXes and uploads them to a GitHub Release.
@@ -28,13 +28,13 @@ You will be prompted for a Personal Access Token (PAT) with **Marketplace > Mana
 
 ```bash
 npx @vscode/vsce publish --pre-release \
-  --packagePath this-code-0.1.0-linux-x64.vsix
+  --packagePath this-code-1.1.0-linux-x64.vsix
 npx @vscode/vsce publish --pre-release \
-  --packagePath this-code-0.1.0-linux-arm64.vsix
+  --packagePath this-code-1.1.0-linux-arm64.vsix
 npx @vscode/vsce publish --pre-release \
-  --packagePath this-code-0.1.0-darwin-arm64.vsix
+  --packagePath this-code-1.1.0-darwin-arm64.vsix
 npx @vscode/vsce publish --pre-release \
-  --packagePath this-code-0.1.0-darwin-x64.vsix
+  --packagePath this-code-1.1.0-darwin-x64.vsix
 ```
 
 > **Important:** The `--pre-release` flag must be included on every `vsce publish` call.
@@ -51,8 +51,8 @@ Install `whardier.this-code` from the VS Code Marketplace (pre-release tab) and 
 ### 1. Tag and trigger CI
 
 ```bash
-git tag cli/v0.1.0
-git push origin cli/v0.1.0
+git tag cli/v1.0.0-alpha.1
+git push origin cli/v1.0.0-alpha.1
 ```
 
 This triggers `.github/workflows/cli-release.yml`, which builds 4 platform binaries and uploads them to a GitHub Release.

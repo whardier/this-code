@@ -79,17 +79,19 @@ chmod +x ~/.this-code/bin/this-code
 
 #### Shell Integration
 
-Add the shim to your PATH so `code` resolves to `this-code`:
+Run the installer to create `~/.this-code/env` and the `code` symlink:
+
+```bash
+this-code install          # bash/zsh
+this-code install --fish   # also write ~/.config/fish/conf.d/this-code.fish
+```
 
 **bash / zsh** — add to `~/.zshrc` (zsh) or `~/.bashrc` (bash):
 ```bash
-eval "$(this-code init zsh)"   # or bash
+. "$HOME/.this-code/env"
 ```
 
-**fish** — add to `~/.config/fish/config.fish`:
-```fish
-this-code init fish | source
-```
+**fish** — no extra step needed after `this-code install --fish`. The conf.d file is auto-sourced by fish on startup.
 
 > **macOS / zsh note:** Use `~/.zshrc`, not `~/.zshenv`. macOS `path_helper` in `/etc/zprofile` reorders PATH before `~/.zshenv` runs, stripping the shim. `~/.zshrc` runs after `path_helper`.
 
@@ -98,20 +100,20 @@ this-code init fish | source
 ## CLI Usage
 
 ```
-this-code [OPTIONS] <COMMAND>
+this-code [COMMAND]
 
 Commands:
-  install   Install shell integration and code symlink
-  init      Print shell integration script (eval this)
-  query     Query session history for a path
-  which     Print the real code binary path for a given path
+  install   Install shell integration (bash/zsh env file + code symlink)
+  query     Show the last-known session for a workspace path
+  which     Print the real code binary path (and matched workspace)
   help      Print help
 
 Options:
-  -v, --verbose   Enable verbose logging
   -h, --help      Print help
   -V, --version   Print version
 ```
+
+> Logging is controlled via the `RUST_LOG` environment variable (e.g. `RUST_LOG=debug this-code install`).
 
 ### Examples
 
@@ -119,17 +121,14 @@ Options:
 # Query last-known session for a directory
 this-code query ~/project
 
-# Dry-run: show what would happen without executing
-this-code query ~/project --dry-run
-
 # JSON output for scripting
 this-code query ~/project --json
 
 # Show which real code binary would be used
 this-code which ~/project
 
-# Install shell integration
-this-code install
+# Install shell integration (bash/zsh + fish)
+this-code install --fish
 ```
 
 ---
@@ -150,7 +149,7 @@ this-code install
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `thisCode.enable` | `true` | Enable or disable session recording |
-| `thisCode.logLevel` | `"info"` | Output channel verbosity (`"debug"`, `"info"`, `"warn"`, `"error"`) |
+| `thisCode.logLevel` | `"info"` | Output channel verbosity (`"off"`, `"info"`, `"debug"`) |
 
 ---
 
