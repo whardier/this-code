@@ -33,9 +33,7 @@ pub(crate) fn open_db(path: &Path) -> Result<Connection> {
     // Add ipc_hook_cli column if the extension hasn't run its v2 migration yet.
     // Error is intentionally ignored: "no such table" (DB not yet initialized)
     // and "duplicate column name" (column already exists) are both expected.
-    let _ = conn.execute_batch(
-        "ALTER TABLE invocations ADD COLUMN ipc_hook_cli TEXT",
-    );
+    let _ = conn.execute_batch("ALTER TABLE invocations ADD COLUMN ipc_hook_cli TEXT");
     Ok(conn)
 }
 

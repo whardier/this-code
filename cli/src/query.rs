@@ -253,7 +253,8 @@ mod tests {
     #[test]
     fn test_find_session_exact_match() {
         let conn = make_ancestry_db();
-        let s = find_session_by_ancestry(&conn, std::path::Path::new("/home/user/project")).unwrap();
+        let s =
+            find_session_by_ancestry(&conn, std::path::Path::new("/home/user/project")).unwrap();
         assert!(s.is_some());
         assert_eq!(s.unwrap().workspace_path, "/home/user/project");
     }
@@ -273,8 +274,7 @@ mod tests {
     #[test]
     fn test_find_session_unrelated_path_returns_none() {
         let conn = make_ancestry_db();
-        let s =
-            find_session_by_ancestry(&conn, std::path::Path::new("/tmp/other/file")).unwrap();
+        let s = find_session_by_ancestry(&conn, std::path::Path::new("/tmp/other/file")).unwrap();
         assert!(s.is_none());
     }
 }

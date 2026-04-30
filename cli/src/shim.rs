@@ -347,13 +347,19 @@ mod tests {
 
     #[test]
     fn test_strip_goto_suffix_absolute_path_with_suffix() {
-        assert_eq!(strip_goto_suffix("/home/user/file.rs:42:1"), "/home/user/file.rs");
+        assert_eq!(
+            strip_goto_suffix("/home/user/file.rs:42:1"),
+            "/home/user/file.rs"
+        );
     }
 
     #[test]
     fn test_strip_goto_suffix_windows_drive_letter_preserved() {
         // C: looks like a colon suffix but "C" is not all-digits — must not strip
-        assert_eq!(strip_goto_suffix("C:\\Users\\foo\\bar.ts:10:5"), "C:\\Users\\foo\\bar.ts");
+        assert_eq!(
+            strip_goto_suffix("C:\\Users\\foo\\bar.ts:10:5"),
+            "C:\\Users\\foo\\bar.ts"
+        );
     }
 
     #[test]
