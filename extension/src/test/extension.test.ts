@@ -472,7 +472,7 @@ suite("PLAT-01: macOS and Linux", () => {
     const fs = require("fs");
     const path = require("path");
 
-    // ci.yml is at project root .github/workflows/ci.yml
+    // ext-ci.yml is at project root .github/workflows/ext-ci.yml
     // __dirname is in extension/out/test/ or extension/src/test/ — resolve upward
     const ciPath = path.resolve(
       __dirname,
@@ -481,7 +481,7 @@ suite("PLAT-01: macOS and Linux", () => {
       "..",
       ".github",
       "workflows",
-      "ci.yml",
+      "ext-ci.yml",
     );
     assert.ok(fs.existsSync(ciPath), `CI workflow must exist at ${ciPath}`);
 

@@ -64,9 +64,6 @@ jobs:
         working-directory: extension
         run: npm test
 
-      - name: Copy LICENSE
-        run: cp LICENSE extension/LICENSE
-
       - name: Package VSIX
         working-directory: extension
         run: |
