@@ -33,18 +33,18 @@ jobs:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: extension/package-lock.json
-        env:
-          npm_config_arch: ${{ matrix.npm_arch }}
 
       - name: Install Xvfb (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get install -y xvfb
 
+      - name: Configure npm architecture (cross-compile)
+        if: matrix.npm_arch != ''
+        run: npm config set arch ${{ matrix.npm_arch }}
+
       - name: Install dependencies
         working-directory: extension
         run: npm ci
-        env:
-          npm_config_arch: ${{ matrix.npm_arch }}
 
       - name: TypeScript typecheck
         working-directory: extension
