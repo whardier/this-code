@@ -18,13 +18,14 @@ export async function checkCliPresence(cliPath: string = DEFAULT_CLI_PATH): Prom
   try {
     await fs.access(cliPath);
   } catch {
-    const action = await vscode.window.showInformationMessage(
+    vscode.window.showInformationMessage(
       `This Code: CLI not found at ${cliPath}`,
       "Download",
-    );
-    if (action === "Download") {
-      await vscode.env.openExternal(vscode.Uri.parse(CLI_DOWNLOAD_URL));
-    }
+    ).then((action) => {
+      if (action === "Download") {
+        vscode.env.openExternal(vscode.Uri.parse(CLI_DOWNLOAD_URL));
+      }
+    });
     return;
   }
 

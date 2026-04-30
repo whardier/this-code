@@ -136,6 +136,7 @@ suite("STOR-03: Schema columns", () => {
       "remote_server_path",
       "server_commit_hash",
       "server_bin_path",
+      "ipc_hook_cli",
       "open_files",
     ].sort();
     assert.deepStrictEqual(
@@ -363,7 +364,7 @@ suite("TRACK-02: Commit hash", () => {
     const fs = require("fs/promises");
     const { writeSessionJson } = require("../storage");
 
-    const hash40 = "a1b2c3d4e5f6".repeat(3) + "a1b2c3d4"; // 40 chars
+    const hash40 = "a1b2c3d4e5f6".repeat(3) + "a1b2"; // 40 chars
     const tmpDir = path.join(os.tmpdir(), "this-code-test-" + Date.now());
     const filePath = path.join(tmpDir, "track02.json");
     const metadata = {
